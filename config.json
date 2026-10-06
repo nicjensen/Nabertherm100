@@ -1,10 +1,12 @@
 {
   "area": "DK1",
   "areas": ["DK1", "DK2"],
+  "nettarif": {
+    "enabled": true,
+    "selskab": "N1"
+  },
   "title": "Priser på Forglødning og Glasurbrænding",
-  "subtitle": "Nabertherm — hvornår er det billigst at starte ovnen?",
-  "tariff_dkk_per_kwh": 0.0,
-  "vat_percent": 0.0,
+  "subtitle": "Nabertherm — hvornår er det billigst at starte ovnen? Priser inkl. nettarif, Energinet-tariffer, elafgift og moms.",
   "hours_shown": 24,
   "tomorrow_note": "Priser i morgen opdateres kl 13:00"
 }

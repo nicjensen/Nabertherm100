@@ -18,9 +18,14 @@ import os
 import sys
 
 import kiln_calc
-from fetch_prices import TZ, _price_by_local_hour, fetch_records, today_local
+import tariffs
+from fetch_prices import (DATASETS, TZ, _price_by_local_hour, fetch_records, today_local)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+# The largest household grid company in each price area, used when the config does
+# not name one for that area.
+DEFAULT_DSO = {"DK1": "N1", "DK2": "Radius"}
 
 
 def load_config(path: str) -> dict:
@@ -32,18 +37,38 @@ def dkk(value: int | None) -> str:
     return "–" if value is None else f"{value:,} kr.".replace(",", ".")
 
 
+def dso_for_area(cfg: dict, area: str) -> str | None:
+    """Which grid company's nettarif applies to this area (None = no tariffs)."""
+    nettarif = cfg.get("nettarif") or {}
+    if not nettarif.get("enabled", False):
+        return None
+    by_area = nettarif.get("selskab_by_area") or {}
+    dso = by_area.get(area)
+    if not dso and area == cfg.get("area"):
+        dso = nettarif.get("selskab")
+    dso = dso or DEFAULT_DSO.get(area)
+    if dso and dso not in tariffs.DSO_TARIFFS:
+        raise SystemExit(f"unknown grid company {dso!r}; known: {sorted(tariffs.DSO_TARIFFS)}")
+    return dso
+
+
 def fetch_two_days(area: str, today: dt.date, cache_dir: str, refresh: bool):
     """One API window per area, sliced into local days. Keeps us inside the rate limit."""
     start = (today - dt.timedelta(days=1)).isoformat()
     end = (today + dt.timedelta(days=3)).isoformat()
-    payload = fetch_records(area, start, end, cache_dir=cache_dir, refresh=refresh)
-    records = payload.get("records") or []
+    tomorrow = today + dt.timedelta(days=1)
 
-    def day(day_value: dt.date) -> list[tuple[str, float]]:
+    def day(records, day_value) -> list[tuple[str, float]]:
         hours = _price_by_local_hour(records, day_value, area)
         return [(f"{h:02d}:00", hours[h]) for h in sorted(hours)]
 
-    return day(today), day(today + dt.timedelta(days=1))
+    for spec in DATASETS:                        # DayAheadPrices, then the old dataset
+        payload = fetch_records(area, start, end, cache_dir=cache_dir, refresh=refresh,
+                                dataset=spec["name"])
+        records = payload.get("records") or []
+        if day(records, today) or day(records, tomorrow):
+            return day(records, today), day(records, tomorrow), spec["name"]
+    return [], [], None
 
 
 def kpi_html(label: str, best: dict | None, coeffs: list[float], pending: bool) -> str:
@@ -90,21 +115,36 @@ def area_toggle(areas: list[str], current: str) -> str:
 
 
 def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
-    hours_today, hours_tomorrow = fetch_two_days(area, today, args.cache, args.refresh)
+    hours_today, hours_tomorrow, dataset = fetch_two_days(area, today, args.cache, args.refresh)
     complete_today = len(hours_today) == 24
     complete_tomorrow = len(hours_tomorrow) == 24
 
+    dso = dso_for_area(cfg, area)
+    tomorrow = today + dt.timedelta(days=1)
+
+    def price_series(hours: list[tuple[str, float]], day: dt.date) -> list[float]:
+        """Spot only, or the all-in price incl. nettarif, Energinet, elafgift and moms."""
+        if not hours:
+            return []
+        if dso:
+            return tariffs.all_in_prices(
+                [{"hour": h, "price": p} for h, p in hours], day, dso)
+        return [p for _, p in hours]
+
+    prices_today = price_series(hours_today, today)
+    prices_tomorrow = price_series(hours_tomorrow, tomorrow)
+
     data = kiln_calc.compute(
-        [p for _, p in hours_today],
-        [p for _, p in hours_tomorrow],
+        prices_today,
+        prices_tomorrow,
         complete_tomorrow,
         hours=cfg.get("hours_shown", 24),
-        tariff_dkk_per_kwh=cfg.get("tariff_dkk_per_kwh", 0.0),
-        vat_percent=cfg.get("vat_percent", 0.0),
+        labels_today=[h for h, _ in hours_today],
+        labels_tomorrow=[h for h, _ in hours_tomorrow] or None,
     )
 
-    spot_map = dict(hours_today)
-    rows = [row_html(r, (r["hour"], spot_map[r["hour"]]) if r["hour"] in spot_map else None)
+    price_map = dict(zip([h for h, _ in hours_today], prices_today))
+    rows = [row_html(r, (r["hour"], price_map[r["hour"]]) if r["hour"] in price_map else None)
             for r in data["rows"]]
 
     kpi = "".join([
@@ -125,13 +165,13 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
         note = cfg.get("tomorrow_note", "Priser i morgen opdateres kl 13:00")
 
     now_local = dt.datetime.now(TZ)
-    basis_bits = [f"spotpris i DKK/kWh (Nord Pool, {area})"]
-    if cfg.get("tariff_dkk_per_kwh"):
-        basis_bits.append(f"tillæg {cfg['tariff_dkk_per_kwh']:.3f} kr./kWh")
-    if cfg.get("vat_percent"):
-        basis_bits.append(f"moms {cfg['vat_percent']:.0f} %")
-    basis = ("Prisgrundlag: " + " + ".join(basis_bits) + ". "
-             "Elafgift og nettarif er ikke medtaget, med mindre der er sat tillæg i config.json.")
+    if dso:
+        basis = tariffs.describe(dso) + (" Faste abonnementer (netabonnement, systemabonnement og "
+                                         "elselskabets månedsgebyr) er ikke medregnet, fordi de ikke "
+                                         "afhænger af, hvornår ovnen startes.")
+    else:
+        basis = ("Prisgrundlag: spotpris i DKK/kWh (Nord Pool) uden nettarif, afgifter og moms — "
+                 "sæt \"nettarif\": {\"enabled\": true} i config.json for at regne dem med.")
 
     profile = (f"Programmer: Forglødning {len(kiln_calc.C_BISC)} timer / "
                f"{sum(kiln_calc.C_BISC):.1f} kWh · Glasur {len(kiln_calc.C_GLAZE)} timer / "
@@ -165,17 +205,21 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
         "generated_at": now_local.isoformat(timespec="seconds"),
         "area": area,
         "date": today.isoformat(),
-        "spot_hours_today": data["hours_today"],
-        "spot_hours_tomorrow": data["hours_tomorrow"],
+        "price_dataset": dataset,
+        "nettarif_selskab": dso,
+        "spot_hours_today": [{"hour": h, "price": p} for h, p in hours_today],
+        "spot_hours_tomorrow": [{"hour": h, "price": p} for h, p in hours_tomorrow],
+        "all_in_hours_today": data["hours_today"],
+        "all_in_hours_tomorrow": data["hours_tomorrow"],
         "rows": data["rows"],
         "cheapest": data["best"],
-        "price_basis": {"tariff_dkk_per_kwh": cfg.get("tariff_dkk_per_kwh", 0.0),
-                        "vat_percent": cfg.get("vat_percent", 0.0)},
+        "price_basis": tariffs.composition() if dso else {"note": "spot only"},
     }
     with open(os.path.join(args.out, f"prices-{area.lower()}.json"), "w") as fh:
         json.dump(snapshot, fh, indent=2, ensure_ascii=False)
 
-    print(f"[{area}] {len(hours_today)}/24 hours today, {len(hours_tomorrow)}/24 tomorrow")
+    print(f"[{area}] {len(hours_today)}/24 hours today, {len(hours_tomorrow)}/24 tomorrow "
+          f"(dataset {dataset}, nettarif {dso or 'none'})")
     for label, key in (("biscuit today", "b_today"), ("glaze today", "g_today"),
                        ("biscuit tomorrow", "b_tom"), ("glaze tomorrow", "g_tom")):
         best = data["best"][key]

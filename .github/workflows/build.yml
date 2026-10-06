@@ -20,12 +20,16 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Parity check against the Home Assistant card
+      - name: Checks (card parity, tariffs, DST)
         run: |
           python -m pip install --quiet jinja2
           python parity_test.py
+          python tariff_test.py
+          python dst_check.py
 
       - name: Build the page
+        env:
+          ENERGIDATA_API_KEY: ${{ secrets.ENERGIDATA_API_KEY }}
         run: python build.py --out docs
 
       - name: Commit if the numbers changed

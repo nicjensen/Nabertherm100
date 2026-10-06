@@ -67,10 +67,25 @@ def _apply_price_basis(entries: list[dict], tariff: float, vat_percent: float) -
 
 def compute(prices_today: list[float], prices_tom: list[float], tomorrow_valid: bool,
             hours: int = 24,
-            tariff_dkk_per_kwh: float = 0.0, vat_percent: float = 0.0) -> dict:
-    """Everything the page needs. Mirrors the Jinja card's branching exactly."""
-    today = [{"hour": f"{h:02d}:00", "price": p} for h, p in enumerate(prices_today)]
-    tomorrow = [{"hour": f"{h:02d}:00", "price": p} for h, p in enumerate(prices_tom)]
+            tariff_dkk_per_kwh: float = 0.0, vat_percent: float = 0.0,
+            labels_today: list[str] | None = None,
+            labels_tomorrow: list[str] | None = None) -> dict:
+    """
+    Everything the page needs. Mirrors the Jinja card's branching exactly.
+
+    labels_* are optional and used only by the website: on the spring-forward day a
+    local day has 23 hours, so the labels must come from the real clock rather than
+    from the array position (otherwise every hour after the gap is mislabelled).
+    """
+    def _entries(prices, labels):
+        out = []
+        for i, price in enumerate(prices):
+            label = labels[i] if labels and i < len(labels) else f"{i:02d}:00"
+            out.append({"hour": label, "price": price})
+        return out
+
+    today = _entries(prices_today, labels_today)
+    tomorrow = _entries(prices_tom, labels_tomorrow)
     if tariff_dkk_per_kwh or vat_percent:
         today = _apply_price_basis(today, tariff_dkk_per_kwh, vat_percent)
         tomorrow = _apply_price_basis(tomorrow, tariff_dkk_per_kwh, vat_percent)
@@ -91,9 +106,11 @@ def compute(prices_today: list[float], prices_tom: list[float], tomorrow_valid: 
     }
     marks = {key: _marks(costs) for key, costs in series.items()}
 
+    # Row count: on a DST day the real clock decides how many start hours exist.
+    row_labels = [e["hour"] for e in today] if labels_today else [f"{i:02d}:00" for i in range(hours)]
     rows = []
-    for i in range(hours):
-        row = {"hour": f"{i:02d}:00"}
+    for i, label in enumerate(row_labels):
+        row = {"hour": label}
         for key in ("b_today", "g_today", "b_tom", "g_tom"):
             if key.endswith("_tom") and not has_tomorrow:
                 row[key] = None

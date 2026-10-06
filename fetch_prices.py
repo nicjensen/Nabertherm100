@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """
-Fetch Danish day-ahead spot prices from Energi Data Service (the same source the
-Home Assistant 'energi_data_service' integration uses).
+Fetch Danish day-ahead spot prices from Energi Data Service (the source the Home
+Assistant 'energi_data_service' integration uses).
 
-SpotPriceDKK is quoted in DKK/MWh -> divided by 1000 to get DKK/kWh.
+Two datasets matter, and they do NOT share a schema:
+  * DayAheadPrices - current, from 2025-10-01: TimeUTC / TimeDK / DayAheadPriceDKK
+  * Elspotprices   - discontinued 2025-09-30:  HourUTC / HourDK / SpotPriceDKK
+
+Prices are quoted in DKK/MWh -> divided by 1000 for DKK/kWh, excluding VAT
+(the marketplace price; VAT is applied later together with the tariffs).
 
 The public API is rate limited hard (HTTP 429, "try again in N seconds").
 This module therefore keeps a disk cache and backs off rather than hammering it.
@@ -20,9 +25,20 @@ import urllib.parse
 import urllib.request
 from zoneinfo import ZoneInfo
 
-API = "https://api.energidataservice.dk/dataset/Elspotprices"
+API = "https://api.energidataservice.dk/dataset/"
 TZ = ZoneInfo("Europe/Copenhagen")
 USER_AGENT = "kiln-price-site/1.0 (+github pages)"
+
+# Tried in order: the current dataset first, the discontinued one as a fallback so
+# historical dates can still be back-tested.
+DATASETS: list[dict] = [
+    {"name": "DayAheadPrices",
+     "time": ("TimeUTC", "HourUTC"),
+     "price": ("DayAheadPriceDKK", "SpotPriceDKK")},
+    {"name": "Elspotprices",
+     "time": ("HourUTC", "TimeUTC"),
+     "price": ("SpotPriceDKK", "DayAheadPriceDKK")},
+]
 
 
 def _headers() -> dict:
@@ -35,9 +51,9 @@ def _headers() -> dict:
     return headers
 
 
-def _cache_path(cache_dir: str, area: str, start: str, end: str) -> str:
+def _cache_path(cache_dir: str, dataset: str, area: str, start: str, end: str) -> str:
     os.makedirs(cache_dir, exist_ok=True)
-    return os.path.join(cache_dir, f"{area}_{start}_{end}.json")
+    return os.path.join(cache_dir, f"{dataset}_{area}_{start}_{end}.json")
 
 
 def _http_json(url: str, tries: int = 4) -> dict:
@@ -49,7 +65,7 @@ def _http_json(url: str, tries: int = 4) -> dict:
                 return json.loads(resp.read().decode())
         except urllib.error.HTTPError as exc:
             body = exc.read().decode(errors="replace")
-            last_err = f"HTTP {exc.code}: {body[:160]}"
+            last_err = f"HTTP {exc.code}: {body[:200]}"
             if exc.code == 429:
                 wait = 120
                 m = re.search(r"(\d+)\s*second", body)
@@ -66,34 +82,70 @@ def _http_json(url: str, tries: int = 4) -> dict:
 
 
 def fetch_records(area: str, start: str, end: str, cache_dir: str = ".cache",
-                  refresh: bool = False) -> dict:
+                  refresh: bool = False, dataset: str = "DayAheadPrices") -> dict:
     """Raw API payload for [start, end) (dates as YYYY-MM-DD, UTC based)."""
-    path = _cache_path(cache_dir, area, start, end)
+    path = _cache_path(cache_dir, dataset, area, start, end)
     if os.path.exists(path) and not refresh:
         with open(path) as fh:
             return json.load(fh)
+    # No sort/order clause: the datasets do not share sortable column names, and the
+    # cashier's own order is fine because rows are indexed by timestamp afterwards.
     query = urllib.parse.urlencode({
         "offset": 0,
         "start": start,
         "end": end,
         "filter": json.dumps({"PriceArea": [area]}),
-        "sort": "HourUTC ASC",
         "limit": 200,
     })
-    payload = _http_json(f"{API}?{query}")
+    payload = _http_json(f"{API}{dataset}?{query}")
     with open(path, "w") as fh:
         json.dump(payload, fh)
     return payload
 
 
+def _first_present(record: dict, candidates: tuple[str, ...]) -> str | None:
+    for name in candidates:
+        if name in record:
+            return name
+    return None
+
+
+def time_field(records: list[dict]) -> str | None:
+    if not records:
+        return None
+    for spec in DATASETS:
+        found = _first_present(records[0], spec["time"])
+        if found:
+            return found
+    return None
+
+
+def price_field(records: list[dict]) -> str | None:
+    """Which column holds the DKK price in this payload."""
+    if not records:
+        return None
+    for spec in DATASETS:
+        found = _first_present(records[0], spec["price"])
+        if found:
+            return found
+    for key in records[0]:
+        if key.lower().endswith("dkk"):
+            return key
+    return None
+
+
 def _price_by_local_hour(records: list[dict], day: dt.date, area: str) -> dict[int, float]:
-    """{local hour -> DKK/kWh} for one local calendar day."""
+    """{local hour -> DKK/kWh excl. moms} for one local calendar day."""
+    tfield = time_field(records)
+    pfield = price_field(records)
+    if not tfield or not pfield:
+        return {}
     out: dict[int, float] = {}
     for rec in records:
         if rec.get("PriceArea") != area:
             continue
-        raw_hour = rec.get("HourUTC")
-        raw_price = rec.get("SpotPriceDKK")
+        raw_hour = rec.get(tfield)
+        raw_price = rec.get(pfield)
         if raw_hour is None or raw_price is None:
             continue
         try:
@@ -107,18 +159,23 @@ def _price_by_local_hour(records: list[dict], day: dt.date, area: str) -> dict[i
 
 
 def day_prices(area: str, day: dt.date, cache_dir: str = ".cache",
-               refresh: bool = False) -> tuple[list[dict], bool]:
+               refresh: bool = False) -> tuple[list[dict], bool, str | None]:
     """
-    Return (entries, complete) where entries is [{'hour': 'HH:00', 'price': kr/kWh}, ...]
-    ordered by local hour, and complete is True when all 24 hours are present.
+    Return (entries, complete, dataset) where entries is
+    [{'hour': 'HH:00', 'price': kr/kWh excl. moms}, ...] ordered by local hour,
+    and complete is True when all 24 hours are present.
     Fetches a UTC window one day wider on each side so DST shifts cannot clip a day.
     """
     start = (day - dt.timedelta(days=1)).isoformat()
     end = (day + dt.timedelta(days=2)).isoformat()
-    payload = fetch_records(area, start, end, cache_dir=cache_dir, refresh=refresh)
-    hours = _price_by_local_hour(payload.get("records") or [], day, area)
-    entries = [{"hour": f"{h:02d}:00", "price": hours[h]} for h in sorted(hours)]
-    return entries, len(hours) == 24
+    for spec in DATASETS:
+        payload = fetch_records(area, start, end, cache_dir=cache_dir, refresh=refresh,
+                                dataset=spec["name"])
+        hours = _price_by_local_hour(payload.get("records") or [], day, area)
+        if hours:
+            entries = [{"hour": f"{h:02d}:00", "price": hours[h]} for h in sorted(hours)]
+            return entries, len(hours) == 24, spec["name"]
+    return [], False, None
 
 
 def today_local() -> dt.date:

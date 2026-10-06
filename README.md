@@ -2,7 +2,8 @@
 
 A static website (GitHub Pages) that answers: **when is it cheapest to start the kiln?**
 It is the Home Assistant markdown card Nick already runs, rendered as a web page that
-updates itself — no Home Assistant needed to *view* it.
+updates itself — no Home Assistant needed to *view* it. Prices are **all-in**: spot +
+nettarif + Energinet + elafgift + moms.
 
 ## What it shows
 
@@ -18,14 +19,36 @@ marking the dashboard card uses. A firing that starts in the evening is priced w
 tomorrow's prices after midnight, because the card (and this site) concatenates today with
 tomorrow before computing the windows.
 
-## Data source
+## The price build-up
 
-`https://api.energidataservice.dk/dataset/Elspotprices` — the same Nord Pool spot prices
-the HA `energi_data_service` integration reads. `SpotPriceDKK` is DKK/**MWh**, so it is
-divided by 1000 here. Prices are **spot only** (no elafgift, no nettarif, no VAT) — that is
-what Nick's dashboard shows, and it means these numbers are comparable to the firing log in
-`~/wiki/nabertherm/`. A flat adder and a VAT percentage can be configured in `config.json`;
-note that a **flat** adder cannot change which hour is cheapest, it only scales the amounts.
+For each hour: **(spotpris + nettarif + Energinet + elafgift) × 1,25 moms**
+
+| Component | 2026 | Varies with |
+|---|---|---|
+| Spotpris (Nord Pool day-ahead) | market | hour |
+| **Nettarif** (grid company, Tarifmodel 3.0) | 11–132 øre/kWh | hour band + season + company |
+| Energinet (systemtarif + transmissionstarif) | 14,38 øre/kWh incl. moms | nothing (same nationwide) |
+| Elafgift | 1,00 øre/kWh incl. moms (0,8 excl.) | nothing — **cut from 72 øre in 2025 to the EU minimum in 2026** |
+| Moms | 25 % | charged on the spot price *and* on the tariffs and the elafgift |
+
+**The nettarif is what makes this worth doing.** Tarifmodel 3.0 splits the day into lavlast
+(00–06), højlast (06–17 and 21–24) and spidslast (17–21), with separate summer (Apr–Sep) and
+winter (Oct–Mar) rates. At N1 the winter spidslast is **98,84 øre/kWh** against 10,98 øre in
+lavlast — about 88 øre/kWh more than the night, on top of the spot price. The site therefore
+ranks start hours on the all-in price, not on spot alone.
+
+**Fixed fees are excluded on purpose**: the netabonnement (~422 kr/yr), the systemabonnement
+and the supplier's monthly fee do not depend on *when* the kiln is fired, so they cannot change
+which start hour is cheapest — they only shift every row by the same amount.
+
+## Data sources
+
+* **Spot**: `api.energidataservice.dk`, dataset **`DayAheadPrices`** (current). The old
+  `Elspotprices` dataset was discontinued on 2025-09-30 and is kept as a fallback for older
+  dates; the two do not share a schema (`TimeUTC`/`DayAheadPriceDKK` vs `HourUTC`/`SpotPriceDKK`).
+  Prices are DKK/**MWh**, divided by 1000, excluding VAT (VAT is applied later).
+* **Nettarif**: the grid companies' published 2026 tariffs, in `tariffs.py` with the source
+  noted per company. **N1** (DK1) and **Radius** (DK2) are included so far.
 
 Tomorrow's prices are published around 13:00 Copenhagen time, so the page shows
 "Priser ikke offentliggjort endnu" for the tomorrow columns until then.
@@ -34,20 +57,26 @@ Tomorrow's prices are published around 13:00 Copenhagen time, so the page shows
 
 | File | Purpose |
 |---|---|
-| `fetch_prices.py` | API client: disk cache, 429 back-off, optional `ENERGIDATA_API_KEY` |
+| `fetch_prices.py` | API client: dataset fallback, disk cache, 429 back-off, optional `ENERGIDATA_API_KEY` |
+| `tariffs.py` | All-in build-up: bands, seasons, grid-company tariffs, Energinet, elafgift, moms |
 | `kiln_calc.py` | The calculation, ported 1:1 from the HA card (+ constant kWh profiles) |
 | `build.py` | Builds `docs/index.html` (+ one page per price area, + JSON snapshot) |
 | `parity_test.py` | Renders the **original card** and this port on identical prices, compares every cell |
+| `tariff_test.py` | Band/season assignment, tax+VAT composition, cross-check against published rates |
+| `dst_check.py` | Spring-forward (23 h) and autumn-back (25 h) day handling |
+| `compare_spot_vs_allin.py` | Shows how much the tariffs add, and whether they move the best start hour |
 | `reference_card.jinja` | Verbatim copy of the Home Assistant card — the parity reference |
 | `template.html` | Page template (dark/light, responsive) |
-| `.github/workflows/build.yml` | Hourly rebuild + commit to `docs/` |
+| `.github/workflows/build.yml` | Runs the test suites, rebuilds hourly, commits to `docs/` |
 
 ## Run it locally
 
 ```bash
 cd ~/workspace/kiln-prices-site
-python3 parity_test.py                      # must print PARITY PASSED
-python3 build.py                            # uses today in Europe/Copenhagen
+python3 parity_test.py     # PARITY PASSED    — the site matches the HA card
+python3 tariff_test.py     # TARIFFS PASSED   — bands, seasons, tax base
+python3 dst_check.py       # DST PASSED       — 23/25-hour days
+python3 build.py                            # today in Europe/Copenhagen
 python3 build.py --date 2025-01-15          # or any date (demo/back-test)
 python3 -m http.server -d docs 8099         # then open http://localhost:8099
 ```
@@ -63,10 +92,16 @@ API key from <https://www.energidataservice.dk/> removes that: export it as
 |---|---|
 | `area` | Price area used for the site root: `DK1` (Jylland/Fyn) or `DK2` (Sjælland) |
 | `areas` | Every area to build a page for; each page links to the others |
-| `tariff_dkk_per_kwh` | Flat adder, e.g. `0.761` for elafgift. Default `0` = spot only |
-| `vat_percent` | e.g. `25`. Default `0` |
+| `nettarif.enabled` | `true` = all-in prices; `false` = spot only (comparable to the HA card) |
+| `nettarif.selskab` | Grid company for the default area, e.g. `N1` |
+| `nettarif.selskab_by_area` | Optional per-area override, e.g. `{"DK1": "N1", "DK2": "Radius"}` |
 | `hours_shown` | Rows in the table (24) |
 | `title` / `subtitle` / `tomorrow_note` | Page text |
+
+**Which grid company do you have?** It follows your address, not your choice — it is on your
+electricity bill (or at eloverblik.dk). DK1 includes N1, Norlys Net, TREFOR, Vores Elnet,
+Konstant, RAH Net, Nord Energi Net and Dinel; DK2 includes Radius, Cerius and Konstant. Only N1
+and Radius are in `tariffs.py` so far; add yours from the company's own price list.
 
 ## Deploy to GitHub Pages
 
@@ -100,6 +135,14 @@ itself needs nothing beyond the default `GITHUB_TOKEN` (`contents: write`).
   card on the dashboard is ever changed (coefficients, thresholds, column order), update
   `reference_card.jinja` from the dashboard and re-run `parity_test.py` before trusting
   the site.
+- **Keep tariffs in one place.** All rates live in `tariffs.py`; the page text and the JSON
+  snapshot are generated from it, so a rate change is a one-line edit plus a rebuild.
+- **Tariff values are 2026 and incl. moms.** Grid companies publish them incl. moms (N1's page
+  was confirmed with its own "Med moms" toggle); Energinet and elafgift are stored incl. moms
+  too, and only the spot price is multiplied by 1.25. `tariff_test.py` guards that arithmetic.
 - **Do not make the page fetch the API from the browser.** The anonymous rate limit is
   tiny and would be consumed by visitors; the build-time snapshot avoids it entirely.
-- DST is handled by `zoneinfo` conversion, so CET/CEST days both map to 24 local hours.
+- **Unit trap:** the API quotes DKK per **MWh**; a factor of 1000 sits between the raw field and
+  every kr figure on the page.
+- DST is handled by `zoneinfo` conversion, so CET/CEST days both map to 24 local hours; the
+  23-hour and 25-hour transition days are covered by `dst_check.py`.
