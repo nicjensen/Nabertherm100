@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Priser på Forglødning og Glasurbrænding</title>
+<meta name="description" content="Billigste starttidspunkt for Forglødning og Glasurbrænding i Nabertherm-ovnen, beregnet på danske spotpriser.">
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d2129; --line:#2a2f3a;
+    --fg:#e8eaf0; --muted:#9aa3b2; --best:#2fbf71; --best-bg:rgba(47,191,113,.14);
+    --second:#e2b93b; --second-bg:rgba(226,185,59,.13); --accent:#ff8a3d;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f5f6f8; --card:#ffffff; --card2:#f0f2f5; --line:#dde1e8; --fg:#15181d;
+           --muted:#5d6675; --best:#1d8f52; --best-bg:rgba(29,143,82,.12);
+           --second:#9a7a12; --second-bg:rgba(154,122,18,.12); --accent:#c25a1a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px 16px 56px;background:var(--bg);color:var(--fg);
+       font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.55rem;margin:0 0 4px;letter-spacing:-.01em}
+  h1 .f{color:var(--accent)}
+  .sub{color:var(--muted);margin:0 0 18px;font-size:.95rem}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;color:var(--muted);
+        font-size:.82rem;margin-bottom:18px}
+  .badge{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+  .note{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);
+        border-radius:10px;padding:10px 14px;margin:0 0 20px;font-size:.9rem}
+  .alert{background:rgba(226,185,59,.12);border:1px solid var(--second);color:var(--fg);
+         border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:.92rem}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .kpi .k{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+  .kpi .h{font-size:1.5rem;font-weight:650;font-variant-numeric:tabular-nums}
+  .kpi .v{color:var(--muted);font-size:.88rem;margin-top:2px}
+  .kpi.pending .h{font-size:1rem;font-weight:500;color:var(--muted)}
+  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);
+        border:1px solid var(--line);border-radius:12px;overflow:hidden;font-variant-numeric:tabular-nums}
+  caption{caption-side:top;text-align:left;color:var(--muted);font-size:.85rem;padding:0 0 8px}
+  th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line);font-size:.94rem}
+  thead th{background:var(--card2);color:var(--fg);font-size:.78rem;text-transform:uppercase;
+           letter-spacing:.05em;font-weight:600;text-align:right;white-space:nowrap}
+  thead th:first-child,th[scope=row]{text-align:left}
+  tbody tr:last-child th,tbody tr:last-child td{border-bottom:none}
+  th[scope=row]{font-weight:600;color:var(--muted)}
+  td.spot{color:var(--muted);font-size:.86rem}
+  td.best{background:var(--best-bg);color:var(--best);font-weight:700}
+  td.second{background:var(--second-bg);color:var(--second);font-weight:700}
+  td.na{color:var(--muted);opacity:.5}
+  tbody tr:hover td,tbody tr:hover th{background:var(--card2)}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.82rem;margin:12px 0 0}
+  .legend b{color:var(--fg);font-weight:600}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+  .dot.b{background:var(--best)} .dot.s{background:var(--second)}
+  footer{margin-top:28px;color:var(--muted);font-size:.82rem}
+  footer p{margin:6px 0}
+  footer code{background:var(--card2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:.85em}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><span class="f">🔥</span> Priser på Forglødning og Glasurbrænding</h1>
+  <p class="sub">Nabertherm — hvornår er det billigst at starte ovnen?</p>
+
+  <div class="meta">
+    <span class="badge">Opdateret 06-10-2026 kl. 16:34</span>
+    <span class="badge">Kilde: Energi Data Service (Nord Pool spot)</span>
+  </div>
+  <div class="meta">Prisområde: <span class="badge"><b>DK1 · Jylland/Fyn ✓</b></span> <a class="badge" href="dk2.html">DK2 · Sjælland</a></div>
+
+  
+  <p class="note">✅ Priser for i morgen er offentliggjort. Nye priser offentliggøres dagligt ca. kl. 13:00.</p>
+
+  <div class="kpis"><div class="kpi"><div class="k">I dag · Forglødning</div><div class="h">20:00</div><div class="v">22 kr. · 29.7 kWh</div></div><div class="kpi"><div class="k">I dag · Glasur</div><div class="h">23:00</div><div class="v">18 kr. · 29.0 kWh</div></div><div class="kpi"><div class="k">I morgen · Forglødning</div><div class="h">03:00</div><div class="v">20 kr. · 29.7 kWh</div></div><div class="kpi"><div class="k">I morgen · Glasur</div><div class="h">00:00</div><div class="v">16 kr. · 29.0 kWh</div></div></div>
+
+  <div class="scroll">
+  <table>
+    <caption>Starttidspunkt = den time ovnen tændes. Beløbet er den samlede elpris for hele brændingen.</caption>
+    <thead>
+      <tr>
+        <th scope="col">🕒 Start</th>
+        <th scope="col">Spot nu</th>
+        <th scope="col">I dag<br>Forglødning</th>
+        <th scope="col">I dag<br>Glasur</th>
+        <th scope="col">I morgen<br>Forglødning</th>
+        <th scope="col">I morgen<br>Glasur</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr><th scope="row">00:00</th><td class="spot">0,46</td><td>45 kr.</td><td class="second"><strong>19 kr.</strong></td><td>23 kr.</td><td class="best"><strong>16 kr.</strong></td></tr>
+    <tr><th scope="row">01:00</th><td class="spot">0,47</td><td>50 kr.</td><td>22 kr.</td><td>22 kr.</td><td class="second"><strong>17 kr.</strong></td></tr>
+    <tr><th scope="row">02:00</th><td class="spot">0,48</td><td>54 kr.</td><td>28 kr.</td><td class="second"><strong>21 kr.</strong></td><td>19 kr.</td></tr>
+    <tr><th scope="row">03:00</th><td class="spot">0,58</td><td>57 kr.</td><td>38 kr.</td><td class="best"><strong>20 kr.</strong></td><td>23 kr.</td></tr>
+    <tr><th scope="row">04:00</th><td class="spot">0,79</td><td>58 kr.</td><td>49 kr.</td><td class="second"><strong>21 kr.</strong></td><td>26 kr.</td></tr>
+    <tr><th scope="row">05:00</th><td class="spot">0,86</td><td>60 kr.</td><td>57 kr.</td><td>22 kr.</td><td>28 kr.</td></tr>
+    <tr><th scope="row">06:00</th><td class="spot">1,00</td><td>62 kr.</td><td>62 kr.</td><td>24 kr.</td><td>26 kr.</td></tr>
+    <tr><th scope="row">07:00</th><td class="spot">1,43</td><td>63 kr.</td><td>65 kr.</td><td>25 kr.</td><td>22 kr.</td></tr>
+    <tr><th scope="row">08:00</th><td class="spot">2,29</td><td>61 kr.</td><td>67 kr.</td><td>24 kr.</td><td>19 kr.</td></tr>
+    <tr><th scope="row">09:00</th><td class="spot">2,35</td><td>58 kr.</td><td>66 kr.</td><td>23 kr.</td><td class="second"><strong>17 kr.</strong></td></tr>
+    <tr><th scope="row">10:00</th><td class="spot">2,32</td><td>54 kr.</td><td>63 kr.</td><td>22 kr.</td><td class="second"><strong>17 kr.</strong></td></tr>
+    <tr><th scope="row">11:00</th><td class="spot">2,27</td><td>50 kr.</td><td>61 kr.</td><td class="second"><strong>21 kr.</strong></td><td>19 kr.</td></tr>
+    <tr><th scope="row">12:00</th><td class="spot">2,32</td><td>45 kr.</td><td>61 kr.</td><td class="na">–</td><td>24 kr.</td></tr>
+    <tr><th scope="row">13:00</th><td class="spot">2,31</td><td>42 kr.</td><td>60 kr.</td><td class="na">–</td><td>28 kr.</td></tr>
+    <tr><th scope="row">14:00</th><td class="spot">2,13</td><td>38 kr.</td><td>57 kr.</td><td class="na">–</td><td>28 kr.</td></tr>
+    <tr><th scope="row">15:00</th><td class="spot">1,96</td><td>35 kr.</td><td>52 kr.</td><td class="na">–</td><td>25 kr.</td></tr>
+    <tr><th scope="row">16:00</th><td class="spot">1,94</td><td>31 kr.</td><td>45 kr.</td><td class="na">–</td><td>22 kr.</td></tr>
+    <tr><th scope="row">17:00</th><td class="spot">2,20</td><td>28 kr.</td><td>39 kr.</td><td class="na">–</td><td>19 kr.</td></tr>
+    <tr><th scope="row">18:00</th><td class="spot">2,01</td><td>25 kr.</td><td>32 kr.</td><td class="na">–</td><td class="second"><strong>17 kr.</strong></td></tr>
+    <tr><th scope="row">19:00</th><td class="spot">1,67</td><td class="second"><strong>23 kr.</strong></td><td>28 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">20:00</th><td class="spot">1,28</td><td class="best"><strong>22 kr.</strong></td><td>26 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">21:00</th><td class="spot">0,96</td><td class="second"><strong>23 kr.</strong></td><td>24 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">22:00</th><td class="spot">1,00</td><td>24 kr.</td><td>21 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">23:00</th><td class="spot">0,66</td><td>24 kr.</td><td class="best"><strong>18 kr.</strong></td><td class="na">–</td><td class="na">–</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot b"></span><b>Billigste</b> starttidspunkt</span>
+    <span><span class="dot s"></span><b>Næstbilligste</b></span>
+    <span>– uden for programmets længde</span>
+  </div>
+
+  <footer>
+    <p>Programmer: Forglødning 13 timer / 29.7 kWh · Glasur 6 timer / 29.0 kWh. Beløbet pr. række er summen af timepris × forbrug for hele brændingen — en brænding der starter om aftenen prissættes med næste dags priser efter midnat.</p>
+    <p>Prisgrundlag: spotpris i DKK/kWh (Nord Pool, DK1). Elafgift og nettarif er ikke medtaget, med mindre der er sat tillæg i config.json.</p>
+    <p>Rådata: <a href="prices.json">JSON med timepriser og beregnede beløb</a> · bygges automatisk hver time af GitHub Actions.</p>
+    <p>Kildekode og beregning: <code>kiln_calc.py</code> (identisk med Home Assistant-kortet, verificeret af <code>parity_test.py</code>).</p>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,128 @@
+
+  ## **🔥 Priser på Forglødning og Glasurbrænding**
+  <span style="text-align: center; display: block;"><i><b>Priser i morgen opdateres kl 13:00</b></i></span>
+
+  | 🕒 | I dag (Forglødning) | I dag (Glasur) | I morgen (Forglødning) | I morgen (Glasur) |
+  | :--- | :--- | :--- | :--- | :--- |
+  {%- set prices_today = state_attr('sensor.energi_data_service', 'raw_today') -%}
+  {%- set prices_tom = state_attr('sensor.energi_data_service', 'raw_tomorrow') -%}
+  {%- set t_valid = state_attr('sensor.energi_data_service', 'tomorrow_valid') | bool(false) -%}
+  {%- set c_bisc = [1.3, 1.5, 1.6, 1.85, 2, 2.2, 2.5, 2.82, 3, 3.1, 3.2, 3.4, 1.22] -%}
+  {%- set c_glaze = [2.2, 2.8, 3.5, 7.15, 7.15, 6.2] -%}
+  {%- set len_bisc = c_bisc | length -%}
+  {%- set len_glaze = c_glaze | length -%}
+
+  {%- if prices_today is not none -%}
+    {# --- COMBINE TODAY + TOMORROW IF VALID --- #}
+    {%- set prices_combined = prices_today + (prices_tom if (t_valid and prices_tom is not none) else []) -%}
+
+    {# --- BISCUIT TODAY (Using combined array for cross-midnight) --- #}
+    {%- set ns_b_today = namespace(costs=[]) -%}
+    {%- for i in range(0, prices_today|length) -%}
+      {%- if (i + len_bisc) <= prices_combined|length -%}
+        {%- set win = prices_combined[i:i+len_bisc] -%}
+        {%- set cost = namespace(val=0) -%}
+        {%- for h in range(0, len_bisc) -%}
+          {%- set cost.val = cost.val + (win[h].price * c_bisc[h]) -%}
+        {%- endfor -%}
+        {%- set ns_b_today.costs = ns_b_today.costs + [cost.val | round(0) | int] -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- set sb_today = ns_b_today.costs | unique | sort -%}
+    {%- set min_b_today = sb_today[0] if sb_today|length > 0 else 9999 -%}
+    {%- set min2_b_today = sb_today[1] if sb_today|length > 1 else 9999 -%}
+
+    {# --- GLAZE TODAY (Using combined array for cross-midnight) --- #}
+    {%- set ns_g_today = namespace(costs=[]) -%}
+    {%- for i in range(0, prices_today|length) -%}
+      {%- if (i + len_glaze) <= prices_combined|length -%}
+        {%- set win = prices_combined[i:i+len_glaze] -%}
+        {%- set cost = namespace(val=0) -%}
+        {%- for h in range(0, len_glaze) -%}
+          {%- set cost.val = cost.val + (win[h].price * c_glaze[h]) -%}
+        {%- endfor -%}
+        {%- set ns_g_today.costs = ns_g_today.costs + [cost.val | round(0) | int] -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- set sg_today = ns_g_today.costs | unique | sort -%}
+    {%- set min_g_today = sg_today[0] if sg_today|length > 0 else 9999 -%}
+    {%- set min2_g_today = sg_today[1] if sg_today|length > 1 else 9999 -%}
+
+    {# --- BISCUIT TOMORROW --- #}
+    {%- set ns_b_tom = namespace(costs=[]) -%}
+    {%- set min_b_tom = 9999 -%}
+    {%- set min2_b_tom = 9999 -%}
+    {%- if t_valid and prices_tom is not none and prices_tom|length >= len_bisc -%}
+      {%- for i in range(0, prices_tom|length - len_bisc + 1) -%}
+        {%- set win = prices_tom[i:i+len_bisc] -%}
+        {%- set cost = namespace(val=0) -%}
+        {%- for h in range(0, len_bisc) -%}
+          {%- set cost.val = cost.val + (win[h].price * c_bisc[h]) -%}
+        {%- endfor -%}
+        {%- set ns_b_tom.costs = ns_b_tom.costs + [cost.val | round(0) | int] -%}
+      {%- endfor -%}
+      {%- set sb_tom = ns_b_tom.costs | unique | sort -%}
+      {%- set min_b_tom = sb_tom[0] if sb_tom|length > 0 else 9999 -%}
+      {%- set min2_b_tom = sb_tom[1] if sb_tom|length > 1 else 9999 -%}
+    {%- endif -%}
+
+    {# --- GLAZE TOMORROW --- #}
+    {%- set ns_g_tom = namespace(costs=[]) -%}
+    {%- set min_g_tom = 9999 -%}
+    {%- set min2_g_tom = 9999 -%}
+    {%- if t_valid and prices_tom is not none and prices_tom|length >= len_glaze -%}
+      {%- for i in range(0, prices_tom|length - len_glaze + 1) -%}
+        {%- set win = prices_tom[i:i+len_glaze] -%}
+        {%- set cost = namespace(val=0) -%}
+        {%- for h in range(0, len_glaze) -%}
+          {%- set cost.val = cost.val + (win[h].price * c_glaze[h]) -%}
+        {%- endfor -%}
+        {%- set ns_g_tom.costs = ns_g_tom.costs + [cost.val | round(0) | int] -%}
+      {%- endfor -%}
+      {%- set sg_tom = ns_g_tom.costs | unique | sort -%}
+      {%- set min_g_tom = sg_tom[0] if sg_tom|length > 0 else 9999 -%}
+      {%- set min2_g_tom = sg_tom[1] if sg_tom|length > 1 else 9999 -%}
+    {%- endif -%}
+
+    {# --- RENDER 24 HOURS --- #}
+    {%- for i in range(0, 24) -%}
+      {%- set hour_str = "%02d:00" | format(i) -%}
+
+      {# Biscuit Today Cell #}
+      {%- set b_today_str = '--' -%}
+      {%- if i < ns_b_today.costs|length -%}
+        {%- set v = ns_b_today.costs[i] -%}
+        {%- if v == min_b_today -%}{%- set b_today_str = '🟢&nbsp;**' ~ v ~ '&nbsp;kr.**' -%}
+        {%- elif v == min2_b_today -%}{%- set b_today_str = '🟡&nbsp;**' ~ v ~ '&nbsp;kr.**' -%}
+        {%- else -%}{%- set b_today_str = v ~ '&nbsp;kr.' -%}{%- endif -%}
+      {%- endif -%}
+
+      {# Glaze Today Cell #}
+      {%- set g_today_str = '--' -%}
+      {%- if i < ns_g_today.costs|length -%}
+        {%- set v = ns_g_today.costs[i] -%}
+        {%- if v == min_g_today -%}{%- set g_today_str = '🟢&nbsp;**' ~ v ~ '&nbsp;kr.**' -%}
+        {%- elif v == min2_g_today -%}{%- set g_today_str = '🟡&nbsp;**' ~ v ~ '&nbsp;kr.**' -%}
+        {%- else -%}{%- set g_today_str = v ~ '&nbsp;kr.' -%}{%- endif -%}
+      {%- endif -%}
+
+      {# Biscuit Tomorrow Cell #}
+      {%- set b_tom_str = '--' -%}
+      {%- if t_valid and prices_tom is not none and i < ns_b_tom.costs|length -%}
+        {%- set v = ns_b_tom.costs[i] -%}
+        {%- if v == min_b_tom -%}{%- set b_tom_str = '🟢&nbsp;**' ~ v ~ '&nbsp;kr.**' -%}
+        {%- elif v == min2_b_tom -%}{%- set b_tom_str = '🟡&nbsp;**' ~ v ~ '&nbsp;kr.**' -%}
+        {%- else -%}{%- set b_tom_str = v ~ '&nbsp;kr.' -%}{%- endif -%}
+      {%- endif -%}
+
+      {# Glaze Tomorrow Cell #}
+      {%- set g_tom_str = '--' -%}
+      {%- if t_valid and prices_tom is not none and i < ns_g_tom.costs|length -%}
+        {%- set v = ns_g_tom.costs[i] -%}
+        {%- if v == min_g_tom -%}{%- set g_tom_str = '🟢&nbsp;**' ~ v ~ '&nbsp;kr.**' -%}
+        {%- elif v == min2_g_tom -%}{%- set g_tom_str = '🟡&nbsp;**' ~ v ~ '&nbsp;kr.**' -%}
+        {%- else -%}{%- set g_tom_str = v ~ '&nbsp;kr.' -%}{%- endif -%}
+      {%- endif %}
+  | **{{ hour_str }}** | {{ b_today_str }} | {{ g_today_str }} | {{ b_tom_str }} | {{ g_tom_str }} |
+    {%- endfor -%}
+  {%- endif -%}
