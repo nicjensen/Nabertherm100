@@ -19,6 +19,15 @@ marking the dashboard card uses. A firing that starts in the evening is priced w
 tomorrow's prices after midnight, because the card (and this site) concatenates today with
 tomorrow before computing the windows.
 
+**A passed optimum is not advertised.** The four "cheapest" cards at the top are checked in
+*your browser*, not at build time — the page is a snapshot rebuilt hourly, so a card can be
+hours stale by the time it is opened. Once a card's start hour is behind the current
+Copenhagen time it is dropped (`kpi_past: "hide"`), or re-pointed to the cheapest start still
+available today (`kpi_past: "remaining"`). A start hour counts as available through the end of
+that clock hour, the check re-runs every minute so a page left open stays honest, and if the
+page is a day old the cards are hidden outright. **The table below always shows the whole day,
+passed hours included** — that is the record; the cards are only the recommendation.
+
 ## The price build-up
 
 For each hour: **(spotpris + nettarif + Energinet + elafgift) × 1,25 moms**
@@ -107,6 +116,7 @@ API key from <https://www.energidataservice.dk/> removes that: export it as
 | `nettarif.selskab` | Grid company for the default area. Currently `Radius` (DK2) |
 | `nettarif.selskab_by_area` | Optional per-area override, e.g. `{"DK1": "N1", "DK2": "Radius"}` |
 | `hours_shown` | Rows in the table (24) |
+| `kpi_past` | `hide` (default) = drop a "today" card once its start hour has passed · `remaining` = re-point it to the cheapest start still available today |
 | `title` / `subtitle` / `tomorrow_note` | Page text |
 
 **Which grid company do you have?** It follows your address, not your choice — it is on your

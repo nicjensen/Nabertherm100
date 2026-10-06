@@ -8,5 +8,6 @@
   "title": "Priser på Forglødning og Glasurbrænding",
   "subtitle": "Nabertherm — hvornår er det billigst at starte ovnen? Priser inkl. nettarif, Energinet-tariffer, elafgift og moms.",
   "hours_shown": 24,
+  "kpi_past": "hide",
   "tomorrow_note": "Priser i morgen opdateres kl 13:00"
 }

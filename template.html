@@ -48,6 +48,8 @@
   td.best{background:var(--best-bg);color:var(--best);font-weight:700}
   td.second{background:var(--second-bg);color:var(--second);font-weight:700}
   td.na{color:var(--muted);opacity:.5}
+  .kpi.elapsed{display:none}
+  .kpi.alternative .k{color:var(--accent)}
   tbody tr:hover td,tbody tr:hover th{background:var(--card2)}
   .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.82rem;margin:12px 0 0}
@@ -60,7 +62,7 @@
   a{color:var(--accent)}
 </style>
 </head>
-<body>
+<body data-build-date="{{BUILD_DATE}}">
 <div class="wrap">
   <h1><span class="f">🔥</span> {{TITLE}}</h1>
   <p class="sub">{{SUBTITLE}}</p>
@@ -107,5 +109,79 @@
     <p>Kildekode og beregning: <code>kiln_calc.py</code> (identisk med Home Assistant-kortet, verificeret af <code>parity_test.py</code>).</p>
   </footer>
 </div>
+
+<script id="kiln-kpi-data" type="application/json">{{KPI_JSON}}</script>
+<script>
+/* A "cheapest today" card is only useful while its start hour is still ahead. The page is a
+   snapshot (rebuilt hourly), so the check runs here, in the viewer's browser, against
+   Copenhagen time — not at build time. A start hour counts as still available through the
+   end of that clock hour. */
+(function () {
+  var data = JSON.parse(document.getElementById("kiln-kpi-data").textContent);
+  var MODE = data.past || "hide";          // "hide" | "remaining" (config: kpi_past)
+
+  function nowInCopenhagen() {
+    var parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Copenhagen", year: "numeric", month: "2-digit",
+      day: "2-digit", hour: "2-digit", hour12: false
+    }).formatToParts(new Date());
+    var pick = function (type) {
+      for (var i = 0; i < parts.length; i++) { if (parts[i].type === type) return parts[i].value; }
+      return "";
+    };
+    return { date: pick("year") + "-" + pick("month") + "-" + pick("day"),
+             hour: parseInt(pick("hour"), 10) % 24 };
+  }
+
+  function cheapestRemaining(series, fromHour) {
+    var best = null;
+    series.forEach(function (pair) {
+      if (pair[0] < fromHour) return;
+      if (!best || pair[1] < best[1]) best = pair;
+    });
+    return best;
+  }
+
+  var cards = [].slice.call(document.querySelectorAll('.kpi[data-day="today"]'));
+  cards.forEach(function (card) {                 // keep the built state to restore from
+    card.setAttribute("data-orig-k", card.querySelector(".k").textContent);
+    card.setAttribute("data-orig-h", card.querySelector(".h").textContent);
+    card.setAttribute("data-orig-v", card.querySelector(".v").textContent);
+  });
+
+  function restore(card) {
+    card.classList.remove("elapsed", "alternative");
+    card.querySelector(".k").textContent = card.getAttribute("data-orig-k");
+    card.querySelector(".h").textContent = card.getAttribute("data-orig-h");
+    card.querySelector(".v").textContent = card.getAttribute("data-orig-v");
+  }
+
+  function apply(now) {
+    now = now || nowInCopenhagen();
+    var stale = now.date !== data.date;        // page built for another day
+    cards.forEach(function (card) {
+      restore(card);                            // idempotent: never stack a decision
+      var built = card.getAttribute("data-hour");
+      if (built === null) return;               // pending / no data
+      if (!stale && now.hour <= parseInt(built, 10)) return;
+      var series = (data.today || {})[card.getAttribute("data-key")];
+      var alt = (!stale && MODE === "remaining" && series)
+        ? cheapestRemaining(series, now.hour) : null;
+      if (alt) {
+        card.classList.add("alternative");
+        card.querySelector(".k").textContent = card.getAttribute("data-label") + " · billigste tilbage";
+        card.querySelector(".h").textContent = ("0" + alt[0]).slice(-2) + ":00";
+        card.querySelector(".v").textContent = alt[1] + " kr. · " + card.getAttribute("data-kwh") + " kWh";
+      } else {
+        card.classList.add("elapsed");
+      }
+    });
+  }
+
+  window.kilnApplyKpi = apply;    // exposed so the check can be driven at any hour in tests
+  apply();
+  setInterval(apply, 60000);      // a page left open crosses hours: re-check every minute
+})();
+</script>
 </body>
 </html>

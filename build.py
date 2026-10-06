@@ -71,16 +71,23 @@ def fetch_two_days(area: str, today: dt.date, cache_dir: str, refresh: bool):
     return [], [], None
 
 
-def kpi_html(label: str, best: dict | None, coeffs: list[float], pending: bool) -> str:
+def kpi_html(label: str, best: dict | None, coeffs: list[float], pending: bool,
+             day: str, key: str) -> str:
+    """day/key/index/kwh ride along as data attributes: the page hides or re-points a card
+    client-side when its start hour has already passed by the time it is viewed."""
+    kwh = sum(coeffs)
     if pending:
-        return (f'<div class="kpi pending"><div class="k">{label}</div>'
+        return (f'<div class="kpi pending" data-day="{day}" data-key="{key}">'
+                f'<div class="k">{label}</div>'
                 f'<div class="h">Priser ikke offentliggjort endnu</div>'
                 f'<div class="v">offentliggøres kl. 13:00</div></div>')
     if best is None:
-        return (f'<div class="kpi pending"><div class="k">{label}</div>'
+        return (f'<div class="kpi pending" data-day="{day}" data-key="{key}">'
+                f'<div class="k">{label}</div>'
                 f'<div class="h">Ingen data</div><div class="v">–</div></div>')
-    kwh = sum(coeffs)
-    return (f'<div class="kpi"><div class="k">{label}</div>'
+    return (f'<div class="kpi" data-day="{day}" data-key="{key}" data-hour="{best["index"]}"'
+            f' data-label="{label}" data-kwh="{kwh:.1f}">'
+            f'<div class="k">{label}</div>'
             f'<div class="h">{best["hour"]}</div>'
             f'<div class="v">{dkk(best["value"])} · {kwh:.1f} kWh</div></div>')
 
@@ -145,11 +152,25 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
     rows = [row_html(r) for r in data["rows"]]
 
     kpi = "".join([
-        kpi_html("I dag · Forglødning", data["best"]["b_today"], kiln_calc.C_BISC, not complete_today),
-        kpi_html("I dag · Glasur", data["best"]["g_today"], kiln_calc.C_GLAZE, not complete_today),
-        kpi_html("I morgen · Forglødning", data["best"]["b_tom"], kiln_calc.C_BISC, not complete_tomorrow),
-        kpi_html("I morgen · Glasur", data["best"]["g_tom"], kiln_calc.C_GLAZE, not complete_tomorrow),
+        kpi_html("I dag · Forglødning", data["best"]["b_today"], kiln_calc.C_BISC,
+                 not complete_today, "today", "b_today"),
+        kpi_html("I dag · Glasur", data["best"]["g_today"], kiln_calc.C_GLAZE,
+                 not complete_today, "today", "g_today"),
+        kpi_html("I morgen · Forglødning", data["best"]["b_tom"], kiln_calc.C_BISC,
+                 not complete_tomorrow, "tomorrow", "b_tom"),
+        kpi_html("I morgen · Glasur", data["best"]["g_tom"], kiln_calc.C_GLAZE,
+                 not complete_tomorrow, "tomorrow", "g_tom"),
     ])
+
+    # Everything the browser needs to decide whether a "today" optimum has already passed,
+    # and (in "remaining" mode) which start hours are still available.
+    kpi_json = {
+        "date": today.isoformat(),
+        "past": cfg.get("kpi_past", "hide"),
+        "today": {key: [[int(r["hour"][:2]), r[key]["value"]]
+                       for r in data["rows"] if r[key] is not None]
+                  for key in ("b_today", "g_today")},
+    }
 
     alert = ""
     if not complete_today:
@@ -191,6 +212,8 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
         "{{ROWS}}": "\n".join(rows),
         "{{PROFILE_NOTE}}": profile,
         "{{BASIS_NOTE}}": basis,
+        "{{BUILD_DATE}}": today.isoformat(),
+        "{{KPI_JSON}}": json.dumps(kpi_json, ensure_ascii=False).replace("</", "<\\/"),
         "{{RAW_LINK}}": "prices.json" if area == cfg["area"] else f"prices-{area.lower()}.json",
     }.items():
         html = html.replace(token, value)
