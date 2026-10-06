@@ -81,6 +81,13 @@ def _http_json(url: str, tries: int = 4) -> dict:
     raise RuntimeError(f"giving up on {url}: {last_err}")
 
 
+def _dataset_spec(name: str) -> dict:
+    for spec in DATASETS:
+        if spec["name"] == name:
+            return spec
+    return DATASETS[0]
+
+
 def fetch_records(area: str, start: str, end: str, cache_dir: str = ".cache",
                   refresh: bool = False, dataset: str = "DayAheadPrices") -> dict:
     """Raw API payload for [start, end) (dates as YYYY-MM-DD, UTC based)."""
@@ -88,14 +95,16 @@ def fetch_records(area: str, start: str, end: str, cache_dir: str = ".cache",
     if os.path.exists(path) and not refresh:
         with open(path) as fh:
             return json.load(fh)
-    # No sort/order clause: the datasets do not share sortable column names, and the
-    # cashier's own order is fine because rows are indexed by timestamp afterwards.
+    # Sort on the dataset's own time column (they differ) and ask for enough rows: at
+    # quarter-hour resolution a year-long window is meaningless, and a small limit would
+    # silently truncate the series before it reaches today.
     query = urllib.parse.urlencode({
         "offset": 0,
         "start": start,
         "end": end,
         "filter": json.dumps({"PriceArea": [area]}),
-        "limit": 200,
+        "sort": f"{_dataset_spec(dataset)['time'][0]} ASC",
+        "limit": 400,
     })
     payload = _http_json(f"{API}{dataset}?{query}")
     with open(path, "w") as fh:
@@ -135,12 +144,20 @@ def price_field(records: list[dict]) -> str | None:
 
 
 def _price_by_local_hour(records: list[dict], day: dt.date, area: str) -> dict[int, float]:
-    """{local hour -> DKK/kWh excl. moms} for one local calendar day."""
+    """
+    {local hour -> DKK/kWh excl. moms} for one local calendar day.
+
+    DayAheadPrices is a QUARTER-HOURLY dataset: every local hour has four records and the
+    hourly price is their MEAN. Sampling a single quarter instead is a real error, not a
+    rounding detail — in the ramp hours it differs from the hour average by up to ~45 øre/kWh,
+    and it silently disagrees with the Home Assistant integration, which averages the four.
+    The discontinued Elspotprices dataset is hourly, where one record is its own mean.
+    """
     tfield = time_field(records)
     pfield = price_field(records)
     if not tfield or not pfield:
         return {}
-    out: dict[int, float] = {}
+    buckets: dict[int, list[float]] = {}
     for rec in records:
         if rec.get("PriceArea") != area:
             continue
@@ -154,17 +171,17 @@ def _price_by_local_hour(records: list[dict], day: dt.date, area: str) -> dict[i
             continue
         local = utc.astimezone(TZ)
         if local.date() == day:
-            out[local.hour] = round(float(raw_price) / 1000.0, 6)  # DKK/MWh -> DKK/kWh
-    return out
+            buckets.setdefault(local.hour, []).append(float(raw_price) / 1000.0)  # DKK/MWh
+    return {h: round(sum(values) / len(values), 6) for h, values in buckets.items()}
 
 
 def day_prices(area: str, day: dt.date, cache_dir: str = ".cache",
                refresh: bool = False) -> tuple[list[dict], bool, str | None]:
     """
     Return (entries, complete, dataset) where entries is
-    [{'hour': 'HH:00', 'price': kr/kWh excl. moms}, ...] ordered by local hour,
-    and complete is True when all 24 hours are present.
-    Fetches a UTC window one day wider on each side so DST shifts cannot clip a day.
+    [{'hour': 'HH:00', 'price': kr/kWh excl. moms}, ...] ordered by local hour, and the
+    price is the MEAN of that hour's sub-hourly records. complete is True when all 24
+    hours are present.
     """
     start = (day - dt.timedelta(days=1)).isoformat()
     end = (day + dt.timedelta(days=2)).isoformat()

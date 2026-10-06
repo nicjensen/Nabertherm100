@@ -47,6 +47,10 @@ which start hour is cheapest — they only shift every row by the same amount.
   `Elspotprices` dataset was discontinued on 2025-09-30 and is kept as a fallback for older
   dates; the two do not share a schema (`TimeUTC`/`DayAheadPriceDKK` vs `HourUTC`/`SpotPriceDKK`).
   Prices are DKK/**MWh**, divided by 1000, excluding VAT (VAT is applied later).
+  **The dataset is quarter-hourly** — four records per local hour, and the hourly price is the
+  **mean** of the four (which is what hourly settlement and the HA integration use). Sampling a
+  single quarter instead drifts by up to ~45 øre/kWh in the ramp hours: it is a real error, not
+  a rounding detail, and it was the one thing that made this page disagree with the dashboard.
 * **Nettarif**: **the official rates from Energi Data Service's DataHub price list**
   (`DatahubPricelist`, ChargeType `D03`, kundekategori C), keyed by the grid company's GLN.
   `refresh_tariffs.py` fetches them into `tariffs_datahub.json` (committed); each row carries
@@ -97,10 +101,10 @@ API key from <https://www.energidataservice.dk/> removes that: export it as
 
 | Key | Meaning |
 |---|---|
-| `area` | Price area used for the site root: `DK1` (Jylland/Fyn) or `DK2` (Sjælland) |
-| `areas` | Every area to build a page for; each page links to the others |
+| `area` | Price area used for the site root: `DK1` (Jylland/Fyn) or `DK2` (Sjælland). Currently `DK2` |
+| `areas` | Every area to build a page for; each page links to the others (currently just `DK2`) |
 | `nettarif.enabled` | `true` = all-in prices; `false` = spot only (comparable to the HA card) |
-| `nettarif.selskab` | Grid company for the default area, e.g. `N1` |
+| `nettarif.selskab` | Grid company for the default area. Currently `Radius` (DK2) |
 | `nettarif.selskab_by_area` | Optional per-area override, e.g. `{"DK1": "N1", "DK2": "Radius"}` |
 | `hours_shown` | Rows in the table (24) |
 | `title` / `subtitle` / `tomorrow_note` | Page text |
@@ -142,6 +146,12 @@ itself needs nothing beyond the default `GITHUB_TOKEN` (`contents: write`).
   card on the dashboard is ever changed (coefficients, thresholds, column order), update
   `reference_card.jinja` from the dashboard and re-run `parity_test.py` before trusting
   the site.
+- **Validate against the live sensor, not only against the card.** The card's whole-kroner
+  cells hide a systematic error; the integration's own numbers do not. Read them from
+  `sensor.energi_data_service`: the attributes carry `region_code` (the price area),
+  `net_operator` (the grid company), the per-hour `today`/`tomorrow` prices, and the exact
+  `tariffs`/`additional_tariffs` it applied. With that, the site can be checked term by term —
+  and those two attributes are also how you learn the area and DSO instead of assuming them.
 - **Keep tariffs in one place.** All rates live in `tariffs.py`; the page text and the JSON
   snapshot are generated from it, so a rate change is a one-line edit plus a rebuild.
 - **Tariff values are 2026 and incl. moms.** Grid companies publish them incl. moms (N1's page

@@ -1,9 +1,9 @@
 {
-  "area": "DK1",
-  "areas": ["DK1", "DK2"],
+  "area": "DK2",
+  "areas": ["DK2"],
   "nettarif": {
     "enabled": true,
-    "selskab": "N1"
+    "selskab": "Radius"
   },
   "title": "Priser på Forglødning og Glasurbrænding",
   "subtitle": "Nabertherm — hvornår er det billigst at starte ovnen? Priser inkl. nettarif, Energinet-tariffer, elafgift og moms.",

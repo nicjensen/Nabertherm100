@@ -53,8 +53,22 @@ def main() -> int:
                           dt.datetime(2025, 10, 27, 5, tzinfo=UTC)), dt.date(2025, 10, 26), "DK1")
     case("autumn-back day -> 24 labelled hours", len(autumn), 24)
     case("autumn-back day -> all hours present", sorted(autumn), list(range(24)))
-    # 02:00 local happens at 00:00Z (CEST) and again at 01:00Z (CET); the later record wins.
-    case("autumn-back day -> doubled hour keeps the later price", autumn[2], 0.11)
+    # 02:00 local happens at 00:00Z (CEST) and again at 01:00Z (CET). Hourly aggregation
+    # carries the MEAN of the two occurrences (the alternative, keeping the later one, was
+    # the pre-2026-10 behaviour and only differed because single quarters were sampled).
+    case("autumn-back day -> doubled hour is the mean of both occurrences", autumn[2], 0.105)
+
+    print("sub-hourly aggregation (DayAheadPrices is quarter-hourly)")
+    # Four quarters per local hour, deliberately different, so the mean is distinguishable
+    # from any single quarter.
+    base = dt.datetime(2025, 11, 10, 23, 0, tzinfo=UTC)
+    quarters = [{"TimeUTC": (base + dt.timedelta(minutes=15 * i)).strftime("%Y-%m-%dT%H:%M:%S"),
+                 "PriceArea": "DK1", "DayAheadPriceDKK": 1000.0 + i * 100.0}
+                for i in range(8)]
+    hours = _price_by_local_hour(quarters, dt.date(2025, 11, 11), "DK1")
+    case("quarter-hourly records collapse to hours", sorted(hours), [0, 1])
+    case("hour value is the mean of its four quarters", round(hours[1], 6), 1.55)
+    case("and is not any single quarter", hours[1] in (1.4, 1.5, 1.6, 1.7), False)
 
     print("row labels follow the clock, not the array index")
     labels = [f"{h:02d}:00" for h in range(24) if h != 2]      # spring-forward day

@@ -40,9 +40,11 @@ BAND_DA = {"lavlast": "Lavlast 00-06", "hoejlast": "Højlast 06-17 + 21-24",
 WINTER_MONTHS = (10, 11, 12, 1, 2, 3)
 
 # Energinet 2026: systemtarif + transmissionstarif, øre/kWh incl. moms.
-# Reported as 6.3 + 5.3 øre excl. moms (elselskaber.dk) or 7.2 + 4.3 øre excl.
-# (eltjek24) — the split differs between sources, the total does not.
-ENERGINET_ORE_INCL_MOMS = 14.38
+# The HA integration carries these as two separate add-ons — transmissions_nettarif 5.4 øre
+# and systemtarif 9.0 øre — i.e. 14.4 øre/kWh incl. moms. Published figures are quoted excl.
+# moms as 6.3 + 5.3 øre (elselskaber.dk) or 7.2 + 4.3 øre (eltjek24); the split differs
+# between sources, the total (~11.5 excl. = 14.4 incl.) does not.
+ENERGINET_ORE_INCL_MOMS = 14.4
 ELAFGIFT_ORE_INCL_MOMS = 1.0     # 0.8 øre excl. moms since 2026-01-01
 
 # Grid company tariffs, øre/kWh INCL. MOMS (as the grid companies publish them).
