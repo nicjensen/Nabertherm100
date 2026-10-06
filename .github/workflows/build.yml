@@ -32,11 +32,19 @@ jobs:
           ENERGIDATA_API_KEY: ${{ secrets.ENERGIDATA_API_KEY }}
         run: python build.py --out docs
 
+      - name: Refresh the official tariff snapshot (monthly)
+        run: |
+          if [ "$(date -u +%d)" = "01" ]; then
+            python refresh_tariffs.py --refresh
+          else
+            echo "not the 1st — keeping the committed snapshot"
+          fi
+
       - name: Commit if the numbers changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs
+          git add docs tariffs_datahub.json
           if git diff --cached --quiet; then
             echo "no change"
           else

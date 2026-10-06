@@ -48,7 +48,7 @@ def main() -> int:
     # 0.50 kr/kWh spot -> 0.625 incl. moms; N1 winter spidslast 98.84 + 14.38 + 1.00 øre
     entries = [{"hour": "18:00", "price": 0.50}]
     want = 0.625 + (98.84 + 14.38 + 1.0) / 100.0
-    case("N1 winter spidslast 18:00", tariffs.all_in_prices(entries, winter, "N1")[0], want, 1e-9)
+    case("N1 winter spidslast 18:00", tariffs.all_in_prices(entries, winter, "N1")[0], want, 0.0005)  # 0,05 øre: official rates carry more decimals than the published table
 
     print("cross-check against N1's own published figures")
     # n1.dk publishes lavlast as 10,98 øre incl. moms and 8,79 øre excl. moms.
@@ -62,15 +62,15 @@ def main() -> int:
     summer = dt.date(2026, 7, 15)
     summer_prices = tariffs.all_in_prices(flat, summer, "N1")
     case("winter 18:00 - winter 03:00 = (98,84-10,98)/100",
-         round(winter_prices[18] - winter_prices[3], 6), round((98.84 - 10.98) / 100, 6), 1e-9)
+         round(winter_prices[18] - winter_prices[3], 6), round((98.84 - 10.98) / 100, 6), 0.0005)  # 0,05 øre: official rates carry more decimals than the published table
     case("winter 18:00 - summer 18:00 = (98,84-42,83)/100",
-         round(winter_prices[18] - summer_prices[18], 6), round((98.84 - 42.83) / 100, 6), 1e-9)
+         round(winter_prices[18] - summer_prices[18], 6), round((98.84 - 42.83) / 100, 6), 0.0005)  # 0,05 øre: official rates carry more decimals than the published table
     case("summer 18:00 - summer 03:00 = (42,83-10,98)/100",
-         round(summer_prices[18] - summer_prices[3], 6), round((42.83 - 10.98) / 100, 6), 1e-9)
+         round(summer_prices[18] - summer_prices[3], 6), round((42.83 - 10.98) / 100, 6), 0.0005)  # 0,05 øre: official rates carry more decimals than the published table
 
     print("fixed subscriptions are excluded (they cannot change the best start hour)")
     case("no fixed fee in the hourly price", tariffs.all_in_prices([{"hour": "03:00", "price": 0.0}], winter, "N1")[0],
-         round((10.98 + 14.38 + 1.0) / 100, 6), 1e-9)
+         round((10.98 + 14.38 + 1.0) / 100, 6), 0.0005)  # 0,05 øre: official rates carry more decimals than the published table
 
     print("effect: does the tariff change which start hour wins?")
     # A realistic winter day: cheap night, expensive evening peak.
@@ -86,6 +86,39 @@ def main() -> int:
          all_in[0] > winter_spot[0], True)
     case("the evening peak is the most expensive hour on the day",
          max(all_in) == all_in[18] or max(all_in) == all_in[17], True)
+
+    print("official DataHub rates vs the fallback table")
+    snap = tariffs.load_snapshot()
+    if not snap:
+        print("       no tariffs_datahub.json — run refresh_tariffs.py to add the official rates")
+    else:
+        check_day = dt.date(2026, 10, 6)
+        for dso in sorted(tariffs.DSO_REGISTRY):
+            official = tariffs.official_nettarif(dso, check_day, snap)
+            case(f"{dso}: a nettarif row covers {check_day}", official is not None, True)
+            if not official:
+                continue
+            # The real invariant: within each Tarifmodel band the official vector must carry
+            # ONE rate, and that rate must agree with the published table for the season.
+            # (Do not assume the bands are contiguous — højlast is 06-17 AND 21-24.)
+            per_band: dict[str, set[float]] = {}
+            for h in range(24):
+                per_band.setdefault(tariffs.band_of_hour(h), set()).add(
+                    round(official[h] * 100 * (1 + tariffs.MOMS), 3))
+            case(f"{dso}: one official rate per band",
+                 {b: len(v) for b, v in per_band.items()},
+                 {"lavlast": 1, "hoejlast": 1, "spidslast": 1})
+            case(f"{dso}: exactly three distinct official rates",
+                 len({round(v, 6) for v in official}), 3)
+            table = tariffs.DSO_TARIFFS[dso][tariffs.season_of(check_day)]
+            for band, values in sorted(per_band.items()):
+                ore_incl = sorted(values)[0]
+                case(f"{dso} {band}: official {ore_incl:.3f} øre vs table {table[band]:.2f} øre",
+                     round(ore_incl, 3), round(table[band], 3), 0.05)
+            # And the description must not claim a contiguous 06-24 højlast block.
+            text = tariffs.describe(dso, snap, day=check_day)
+            case(f"{dso}: description shows the split højlast block",
+                 "kl. 06-17" in text and "kl. 21-24" in text, True)
 
     print("\nTARIFFS", "PASSED" if not FAILED else f"FAILED ({len(FAILED)})")
     return 0 if not FAILED else 1

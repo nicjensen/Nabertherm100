@@ -23,6 +23,8 @@ they cannot change which start hour is cheapest.
 from __future__ import annotations
 
 import datetime as dt
+import json
+import os
 
 MOMS = 0.25
 
@@ -57,11 +59,54 @@ DSO_TARIFFS: dict[str, dict] = {
         "area": "DK2",
         "label": "Radius Elnet — København, Nordsjælland, dele af Midtsjælland",
         "sommer": {"lavlast": 13.27, "hoejlast": 19.91, "spidslast": 51.76},
-        "vinter": {"lavlast": 13.32, "hoejlast": 39.85, "spidslast": 119.42},
-        "source": "minenergiberegner.dk verified 2026 summer table (incl. moms) + "
-                  "elselskaber.dk winter table — CHECK AGAINST YOUR OWN BILL",
+        "vinter": {"lavlast": 13.27, "hoejlast": 39.82, "spidslast": 119.45},
+        "source": "vinter: DataHub nettarif C (code DT_C_01, gældende 2026-10-01..2027-04-01) "
+                  "= 10,6175 / 31,8524 / 95,5573 øre excl. moms; sommer: verified 2026 summer "
+                  "table (minenergiberegner.dk + elselskaber.dk)",
     },
 }
+
+
+# Official DataHub identity per grid company: the Global Location Number and the charge
+# code of the household nettarif (kundekategori C). refresh_tariffs.py uses this to fetch
+# the official hourly rates, and tariff_test.py uses it to guard the table above.
+DSO_REGISTRY = {
+    "N1": {"gln": "5790001089030", "charge_code": "CD", "area": "DK1"},
+    "Radius": {"gln": "5790000705689", "charge_code": "DT_C_01", "area": "DK2"},
+}
+
+DATAHUB_SNAPSHOT = "tariffs_datahub.json"
+
+
+def load_snapshot(path: str | None = None) -> dict:
+    """The committed snapshot written by refresh_tariffs.py ({} when it is absent)."""
+    if path is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), DATAHUB_SNAPSHOT)
+    if not os.path.exists(path):
+        return {}
+    with open(path) as fh:
+        return json.load(fh)
+
+
+def official_nettarif(dso: str, day: dt.date, snapshot: dict | None = None) -> list[float] | None:
+    """
+    The 24 hourly nettarif values (kr/kWh excl. moms) that are valid on `day`, straight
+    from the DataHub price list — the rows carry the seasons in their validity range, so
+    no season rule is needed. None when no row covers that day.
+    """
+    snap = snapshot if snapshot is not None else load_snapshot()
+    company = (snap.get("companies") or {}).get(dso)
+    if not company:
+        return None
+    for row in company.get("rows", []):
+        try:
+            start = dt.date.fromisoformat(row["valid_from"])
+            end = dt.date.fromisoformat(row["valid_to"])
+        except (KeyError, ValueError, TypeError):
+            continue
+        if start <= day < end:
+            return row.get("prices_kr_per_kwh_excl_moms")
+    return None
 
 
 def band_of_hour(hour: int) -> str:
@@ -75,14 +120,19 @@ def season_of(day: dt.date) -> str:
     return "vinter" if day.month in WINTER_MONTHS else "sommer"
 
 
-def grid_ore_per_kwh(dso: str, day: dt.date, hour: int) -> float:
+def grid_ore_per_kwh(dso: str, day: dt.date, hour: int, snapshot: dict | None = None) -> float:
     """Nettarif + Energinet + elafgift for one hour, øre/kWh incl. moms."""
-    profile = DSO_TARIFFS[dso]
-    nettarif = profile[season_of(day)][band_of_hour(hour)]
+    official = official_nettarif(dso, day, snapshot)
+    if official:
+        nettarif = official[hour] * 100 * (1 + MOMS)      # kr/kWh excl. -> øre incl. moms
+    else:
+        profile = DSO_TARIFFS[dso]                        # fallback: published table
+        nettarif = profile[season_of(day)][band_of_hour(hour)]
     return nettarif + ENERGINET_ORE_INCL_MOMS + ELAFGIFT_ORE_INCL_MOMS
 
 
-def all_in_prices(entries: list[dict], day: dt.date, dso: str) -> list[float]:
+def all_in_prices(entries: list[dict], day: dt.date, dso: str,
+                  snapshot: dict | None = None) -> list[float]:
     """
     Turn a day's spot entries into all-in DKK/kWh incl. moms.
 
@@ -92,7 +142,7 @@ def all_in_prices(entries: list[dict], day: dt.date, dso: str) -> list[float]:
     for entry in entries:
         hour = int(str(entry["hour"]).split(":")[0])
         spot_incl = float(entry["price"]) * (1.0 + MOMS)
-        out.append(round(spot_incl + grid_ore_per_kwh(dso, day, hour) / 100.0, 6))
+        out.append(round(spot_incl + grid_ore_per_kwh(dso, day, hour, snapshot) / 100.0, 6))
     return out
 
 
@@ -102,8 +152,41 @@ def composition() -> dict:
             "elafgift_ore_incl_moms": ELAFGIFT_ORE_INCL_MOMS}
 
 
-def describe(dso: str) -> str:
+def _runs(vector: list[float]) -> list[tuple[int, int, float]]:
+    """
+    Contiguous runs of equal values: (start hour, end hour exclusive, value).
+
+    The bands are NOT contiguous — højlast is 06-17 plus 21-24 — so a run-based
+    description is the only honest way to render the official vector.
+    """
+    runs: list[tuple[int, int, float]] = []
+    start = 0
+    for hour in range(1, 25):
+        if hour == 24 or vector[hour] != vector[start]:
+            runs.append((start, hour, vector[start]))
+            start = hour
+    return runs
+
+
+def describe(dso: str, snapshot: dict | None = None, day: dt.date | None = None) -> str:
     profile = DSO_TARIFFS[dso]
+    day = day or dt.date.today()
+    official = official_nettarif(dso, day, snapshot)
+    if official:
+        snap = snapshot if snapshot is not None else load_snapshot()
+        company = snap["companies"][dso]
+        row = next((r for r in company["rows"]
+                    if r["valid_from"] <= day.isoformat() < r["valid_to"]), {})
+        rates = [f"{BAND_DA.get(band_of_hour(start), 'Time').split(' ')[0]} "
+                 f"kl. {start:02d}-{end:02d} {value * 100 * (1 + MOMS):.2f} øre"
+                 for start, end, value in _runs(official)]
+        return (f"Nettarif {profile['label']}: " + " · ".join(rates)
+                + f" (officiel sats fra Energi Data Service DataHub, kode "
+                  f"{row.get('charge_type_code', '?')}, gældende "
+                  f"{row.get('valid_from', '?')} til {row.get('valid_to', '?')}). "
+                + f"Energinet (system+transmission) {ENERGINET_ORE_INCL_MOMS:.2f} øre/kWh og "
+                  f"elafgift {ELAFGIFT_ORE_INCL_MOMS:.2f} øre/kWh er ens hele døgnet. "
+                  f"Alt er inkl. moms (spotprisen ganges med 1,25).")
     parts = []
     for season in ("vinter", "sommer"):
         rates = profile[season]

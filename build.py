@@ -85,7 +85,7 @@ def kpi_html(label: str, best: dict | None, coeffs: list[float], pending: bool) 
             f'<div class="v">{dkk(best["value"])} · {kwh:.1f} kWh</div></div>')
 
 
-def row_html(row: dict, spot: tuple[str, float] | None) -> str:
+def row_html(row: dict) -> str:
     def cell(key: str) -> str:
         c = row[key]
         if c is None:
@@ -94,9 +94,7 @@ def row_html(row: dict, spot: tuple[str, float] | None) -> str:
         body = f'<strong>{dkk(c["value"])}</strong>' if c["mark"] else dkk(c["value"])
         return f"<td{cls}>{body}</td>"
 
-    spot_cell = (f'<td class="spot">{spot[1]:.2f}</td>'.replace(".", ",")
-                 if spot else '<td class="na">–</td>')
-    return (f'    <tr><th scope="row">{row["hour"]}</th>{spot_cell}'
+    return (f'    <tr><th scope="row">{row["hour"]}</th>'
             + cell("b_today") + cell("g_today") + cell("b_tom") + cell("g_tom")
             + "</tr>")
 
@@ -121,6 +119,7 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
 
     dso = dso_for_area(cfg, area)
     tomorrow = today + dt.timedelta(days=1)
+    snapshot = tariffs.load_snapshot()      # official DataHub rates when available
 
     def price_series(hours: list[tuple[str, float]], day: dt.date) -> list[float]:
         """Spot only, or the all-in price incl. nettarif, Energinet, elafgift and moms."""
@@ -128,7 +127,7 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
             return []
         if dso:
             return tariffs.all_in_prices(
-                [{"hour": h, "price": p} for h, p in hours], day, dso)
+                [{"hour": h, "price": p} for h, p in hours], day, dso, snapshot)
         return [p for _, p in hours]
 
     prices_today = price_series(hours_today, today)
@@ -143,9 +142,7 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
         labels_tomorrow=[h for h, _ in hours_tomorrow] or None,
     )
 
-    price_map = dict(zip([h for h, _ in hours_today], prices_today))
-    rows = [row_html(r, (r["hour"], price_map[r["hour"]]) if r["hour"] in price_map else None)
-            for r in data["rows"]]
+    rows = [row_html(r) for r in data["rows"]]
 
     kpi = "".join([
         kpi_html("I dag · Forglødning", data["best"]["b_today"], kiln_calc.C_BISC, not complete_today),
@@ -166,9 +163,10 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
 
     now_local = dt.datetime.now(TZ)
     if dso:
-        basis = tariffs.describe(dso) + (" Faste abonnementer (netabonnement, systemabonnement og "
-                                         "elselskabets månedsgebyr) er ikke medregnet, fordi de ikke "
-                                         "afhænger af, hvornår ovnen startes.")
+        basis = tariffs.describe(dso, snapshot, day=today) + (
+            " Faste abonnementer (netabonnement, systemabonnement og "
+            "elselskabets månedsgebyr) er ikke medregnet, fordi de ikke "
+            "afhænger af, hvornår ovnen startes.")
     else:
         basis = ("Prisgrundlag: spotpris i DKK/kWh (Nord Pool) uden nettarif, afgifter og moms — "
                  "sæt \"nettarif\": {\"enabled\": true} i config.json for at regne dem med.")

@@ -47,8 +47,13 @@ which start hour is cheapest — they only shift every row by the same amount.
   `Elspotprices` dataset was discontinued on 2025-09-30 and is kept as a fallback for older
   dates; the two do not share a schema (`TimeUTC`/`DayAheadPriceDKK` vs `HourUTC`/`SpotPriceDKK`).
   Prices are DKK/**MWh**, divided by 1000, excluding VAT (VAT is applied later).
-* **Nettarif**: the grid companies' published 2026 tariffs, in `tariffs.py` with the source
-  noted per company. **N1** (DK1) and **Radius** (DK2) are included so far.
+* **Nettarif**: **the official rates from Energi Data Service's DataHub price list**
+  (`DatahubPricelist`, ChargeType `D03`, kundekategori C), keyed by the grid company's GLN.
+  `refresh_tariffs.py` fetches them into `tariffs_datahub.json` (committed); each row carries
+  its own season in `ValidFrom`/`ValidTo` and one price per local hour (`Price1..24`, kr/kWh
+  excl. moms). When no row covers the day, `tariffs.py` falls back to its own published table
+  (source noted per company). Configured so far: **N1** (DK1, GLN 5790001089030, code `CD`)
+  and **Radius** (DK2, GLN 5790000705689, code `DT_C_01`).
 
 Tomorrow's prices are published around 13:00 Copenhagen time, so the page shows
 "Priser ikke offentliggjort endnu" for the tomorrow columns until then.
@@ -58,6 +63,8 @@ Tomorrow's prices are published around 13:00 Copenhagen time, so the page shows
 | File | Purpose |
 |---|---|
 | `fetch_prices.py` | API client: dataset fallback, disk cache, 429 back-off, optional `ENERGIDATA_API_KEY` |
+| `refresh_tariffs.py` | Fetches the official nettarif rows from DataHub into `tariffs_datahub.json` |
+| `tariffs_datahub.json` | Committed snapshot of those rows (validity range + 24 hourly prices) |
 | `tariffs.py` | All-in build-up: bands, seasons, grid-company tariffs, Energinet, elafgift, moms |
 | `kiln_calc.py` | The calculation, ported 1:1 from the HA card (+ constant kWh profiles) |
 | `build.py` | Builds `docs/index.html` (+ one page per price area, + JSON snapshot) |
@@ -142,6 +149,14 @@ itself needs nothing beyond the default `GITHUB_TOKEN` (`contents: write`).
   too, and only the spot price is multiplied by 1.25. `tariff_test.py` guards that arithmetic.
 - **Do not make the page fetch the API from the browser.** The anonymous rate limit is
   tiny and would be consumed by visitors; the build-time snapshot avoids it entirely.
+- **Refresh the tariffs monthly**: `python3 refresh_tariffs.py --refresh` (the CI job does it on
+  the 1st). Rates change on 1 Jan / 1 Apr / 1 Oct, and a stale table would silently price the
+  page wrongly. The script **must** filter on `ChargeTypeCode`: a grid company publishes dozens
+  of charge codes, and an unfiltered multi-year window is truncated before it reaches the row
+  that is valid today.
+- **The official rates are the ground truth.** `tariff_test.py` compares the fallback table in
+  `tariffs.py` against the DataHub snapshot — if the two ever disagree by more than 0.05 øre,
+  the test fails rather than quietly repricing the page.
 - **Unit trap:** the API quotes DKK per **MWh**; a factor of 1000 sits between the raw field and
   every kr figure on the page.
 - DST is handled by `zoneinfo` conversion, so CET/CEST days both map to 24 local hours; the
