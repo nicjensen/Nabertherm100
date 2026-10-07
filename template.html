@@ -51,22 +51,25 @@
          padding:11px 13px;margin:0 0 14px;font-size:.86rem}
   .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:0 0 16px}
   .hero-tile{background:linear-gradient(160deg,var(--hero-a),var(--hero-b));border:1px solid var(--line);
-             border-radius:16px;padding:15px 16px}
-  .hero-tile.muted{background:var(--card)}
+             border-radius:16px;padding:13px 15px}
   .hero-tile[hidden]{display:none}
-  .hero-tile .n{margin:0;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  .hero-tile .n{margin:0 0 6px;font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
                 color:var(--muted);font-weight:700}
-  .hero-tile .v{margin:5px 0 2px;font-size:2.2rem;font-weight:750;letter-spacing:-.03em;
-                color:var(--best);font-variant-numeric:tabular-nums}
-  .hero-tile .v span{font-size:.85rem;color:var(--muted);margin-left:4px;font-weight:600}
-  .hero-tile.muted .v{color:var(--muted);font-size:1.5rem;font-weight:600}
-  .hero-tile .m{margin:0;font-size:.78rem;color:var(--muted)}
-  .hero-tile.alt .m{color:var(--accent)}
+  .drow{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:8px;margin-top:4px}
+  .drow[hidden]{display:none}
+  .drow .d{font-size:.68rem;color:var(--muted);white-space:nowrap}
+  .drow .v{font-size:1.3rem;font-weight:750;letter-spacing:-.01em;text-align:right;
+           color:var(--best);font-variant-numeric:tabular-nums}
+  .drow .v span{font-size:.68rem;color:var(--muted);margin-left:2px;font-weight:600}
+  .drow .v.dash{font-size:.95rem;font-weight:600;color:var(--muted)}
+  .drow .h{font-size:.68rem;color:var(--muted);white-space:nowrap}
+  .hero-tile.alt .drow[data-day="today"] .d{color:var(--accent)}
   table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;background:var(--card);
         border:1px solid var(--line);border-radius:16px;overflow:hidden;font-variant-numeric:tabular-nums}
   thead th{background:var(--card2);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;
            color:var(--muted);font-weight:700;padding:8px 6px;text-align:center;white-space:nowrap}
-  thead tr.grp th{font-size:.82rem;color:var(--fg);text-transform:none;letter-spacing:0;padding:11px 6px}
+  thead tr.grp th{font-size:.82rem;color:var(--fg);text-transform:none;letter-spacing:0;padding:11px 6px;
+                  vertical-align:top}
   thead tr.grp th.d2{background:var(--day2);border-left:2px solid var(--divider)}
   thead tr.grp th span{display:block;color:var(--muted);font-size:.68rem;font-weight:500;margin-top:1px}
   .pill{display:inline-block;margin-top:5px;font-size:.62rem;font-weight:650;color:var(--muted);
@@ -229,47 +232,50 @@
 
   function tileKey(tile) { return tile.getAttribute("data-key"); }           // "b" | "g"
 
-  function tileSpec(tile) {
-    var kwh = (data.kwh || {})[tileKey(tile)];
-    return kwh ? kwh.toFixed(1).replace(".", ",") + " kWh" : "";
-  }
+  function dayRow(tile, day) { return tile.querySelector('.drow[data-day="' + day + '"]'); }
 
-  function tileShow(tile, value, hourIndex, when) {
-    tile.hidden = false;
-    tile.classList.remove("muted", "alt");
-    tile.querySelector(".v").innerHTML = value + "<span>kr</span>";
-    var spec = tileSpec(tile);
-    tile.querySelector(".m").textContent = when + " kl. " + hhmm(hourIndex)
-      + (spec ? " · " + spec : "");
-  }
-
-  function tilePending(tile, text) {
-    tile.hidden = false;
-    tile.classList.add("muted");
-    tile.classList.remove("alt");
-    tile.querySelector(".v").innerHTML = "–";
-    var spec = tileSpec(tile);
-    tile.querySelector(".m").textContent = text + (spec ? " · " + spec : "");
+  function setRow(row, label, value, hour) {
+    row.hidden = false;
+    row.querySelector(".d").textContent = label;
+    var v = row.querySelector(".v");
+    var h = row.querySelector(".h");
+    if (value === null) {
+      v.className = "v dash";
+      v.textContent = "–";
+      h.textContent = "";
+      return;
+    }
+    v.className = "v";
+    v.innerHTML = value + "<span>kr</span>";
+    h.textContent = "kl. " + hour;
   }
 
   function renderTiles(now) {
     var stale = now.date !== shownDate;
     tiles.forEach(function (tile) {
+      tile.hidden = !!stale;
+      if (stale) return;
+      var cheap = data.cheapest || {};
       var key = tileKey(tile);
-      var prog = key === "b" ? "Forglødning" : "Glasur";
-      var best = (data.cheapest || {})[key + "_today"];
-      if (stale) { tilePending(tile, "priserne er forældede"); return; }
-      if (!best) { tilePending(tile, "offentliggøres ca. kl. 13:00"); return; }
-      var hourIndex = parseInt(best.hour.slice(0, 2), 10);
-      if (now.hour <= hourIndex) {                       // still ahead of us
-        tileShow(tile, best.value, hourIndex, "billigste start i dag");
-        return;
-      }
+      var today = cheap[key + "_today"];
+      var tomorrow = cheap[key + "_tom"];
+      tile.classList.remove("alt");
+      // tomorrow: dashes before the afternoon publication, its optimum after
+      setRow(dayRow(tile, "tomorrow"), "I morgen", tomorrow ? tomorrow.value : null,
+             tomorrow ? tomorrow.hour : null);
+      // today: shown while its hour is ahead, re-pointed in "remaining" mode, else dropped
+      if (!today) { setRow(dayRow(tile, "today"), "I dag", null, null); return; }
+      var hourIndex = parseInt(today.hour.slice(0, 2), 10);
+      if (now.hour <= hourIndex) { setRow(dayRow(tile, "today"), "I dag", today.value, today.hour); return; }
       if (MODE === "remaining") {
         var alt = cheapestRemaining((data["today"] || {})[key + "_today"], now.hour);
-        if (alt) { tileShow(tile, alt[1], alt[0], "billigste tilbage i dag"); tile.classList.add("alt"); return; }
+        if (alt) {
+          setRow(dayRow(tile, "today"), "Tilbage i dag", alt[1], hhmm(alt[0]));
+          tile.classList.add("alt");
+          return;
+        }
       }
-      tile.hidden = true;                                // "hide": a passed optimum is noise
+      dayRow(tile, "today").hidden = true;               // "hide": a passed optimum is noise
     });
   }
 

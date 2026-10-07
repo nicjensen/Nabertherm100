@@ -71,19 +71,23 @@ def fetch_two_days(area: str, today: dt.date, cache_dir: str, refresh: bool):
     return [], [], None
 
 
-def hero_tile(key: str, prog: str, best: dict | None, coeffs: list[float], pending: bool) -> str:
-    """One recommendation tile. The server renders today's state; the browser re-renders the
-    same tile from the embedded data at the day rollover and once an optimum's hour has passed."""
-    spec = f"{sum(coeffs):.1f} kWh".replace(".", ",")
-    if pending or best is None:
-        msg = "offentliggøres ca. kl. 13:00" if pending else "ingen data"
-        return (f'<div class="hero-tile muted" data-key="{key}" data-prog="{prog}" data-spec="{spec}">'
-                f'<p class="n">{prog}</p><p class="v">–</p>'
-                f'<p class="m">{msg} · {spec}</p></div>')
-    return (f'<div class="hero-tile" data-key="{key}" data-prog="{prog}" data-spec="{spec}">'
+def hero_tile(key: str, prog: str, best_today: dict | None, best_tom: dict | None) -> str:
+    """One recommendation tile, carrying both days: today's optimum and tomorrow's (a dash until
+    the afternoon publication fills it in). The browser re-renders both rows from the embedded
+    data once an optimum's hour has passed or the day rolls over."""
+    def row(label: str, day: str, best: dict | None) -> str:
+        if best is None:
+            inner = '<span class="v dash">–</span><span class="h"></span>'
+        else:
+            inner = (f'<span class="v">{best["value"]:.0f}<span>kr</span></span>'
+                     f'<span class="h">kl. {best["hour"]}</span>')
+        return f'<div class="drow" data-day="{day}"><span class="d">{label}</span>{inner}</div>'
+
+    return (f'<div class="hero-tile" data-key="{key}" data-prog="{prog}">'
             f'<p class="n">{prog}</p>'
-            f'<p class="v">{best["value"]:.0f}<span>kr</span></p>'
-            f'<p class="m">billigste start i dag kl. {best["hour"]} · {spec}</p></div>')
+            + row("I dag", "today", best_today)
+            + row("I morgen", "tomorrow", best_tom)
+            + "</div>")
 
 
 def row_html(row: dict) -> str:
@@ -149,8 +153,8 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
     rows = [row_html(r) for r in data["rows"]]
 
     hero = "".join([
-        hero_tile("b", "Forglødning", data["best"]["b_today"], kiln_calc.C_BISC, not complete_today),
-        hero_tile("g", "Glasur", data["best"]["g_today"], kiln_calc.C_GLAZE, not complete_today),
+        hero_tile("b", "Forglødning", data["best"]["b_today"], data["best"]["b_tom"]),
+        hero_tile("g", "Glasur", data["best"]["g_today"], data["best"]["g_tom"]),
     ])
 
     # Everything the browser needs to decide whether a "today" optimum has already passed,
