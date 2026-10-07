@@ -70,7 +70,18 @@
            color:var(--muted);font-weight:700;padding:8px 6px;text-align:center;white-space:nowrap}
   thead tr.grp th{font-size:.82rem;color:var(--fg);text-transform:none;letter-spacing:0;padding:11px 6px;
                   vertical-align:top}
-  thead tr.grp th.d2{background:var(--day2);border-left:2px solid var(--divider)}
+  thead tr.grp th.d2{background:var(--day2)}
+  /* START sits over the hour column, so it has to line up with those left-aligned hours */
+  thead tr:last-child th:first-child{text-align:left;padding-left:12px}
+  /* tomorrow's columns are tinted in every row of the table ... */
+  thead tr:last-child th:nth-child(4),thead tr:last-child th:nth-child(5){background:var(--day2)}
+  /* ... and two dividers run the full height of the grid: one between the two days, one
+     between the hour column and the first day. Every row has to carry them, or the line breaks
+     where a row is missing it. */
+  thead tr.grp th.d2,thead tr:last-child th:nth-child(4),tbody td:nth-child(4){
+    border-left:2px solid var(--divider)}
+  thead tr.grp th:nth-child(2),thead tr:last-child th:nth-child(2),tbody td:nth-child(2){
+    border-left:2px solid var(--divider)}
   thead tr.grp th span{display:block;color:var(--muted);font-size:.68rem;font-weight:500;margin-top:1px}
   .pill{display:inline-block;margin-top:5px;font-size:.62rem;font-weight:650;color:var(--muted);
         background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:2px 6px}
@@ -80,10 +91,7 @@
            width:24%;white-space:nowrap}
   tbody td.v{font-weight:600}
   tbody td.dash{color:var(--dash);font-weight:400}
-  /* tomorrow's two columns carry their own tint and a firm divider, so the eye reads two days
-     in one grid rather than six loose columns */
   tbody td:nth-child(4),tbody td:nth-child(5){background:var(--day2)}
-  tbody td:nth-child(4){border-left:2px solid var(--divider)}
   tbody td.best{background:var(--best-bg);color:var(--best);font-weight:750}
   tbody td.second{background:var(--second-bg);color:var(--second);font-weight:750}
   tbody tr.now th{box-shadow:inset 3px 0 0 var(--accent);color:var(--fg)}
@@ -106,7 +114,7 @@
 <body data-build-date="2026-10-07">
 <header>
   <h1><span class="f">🔥</span> Priser på Forglødning og Glasurbrænding</h1>
-  <p class="metaline">DK1 · N1 Elnet · opdateret 07-10-2026 kl. 13:40</p>
+  <p class="metaline">DK1 · N1 Elnet · opdateret 07-10-2026 kl. 13:48</p>
 </header>
 <main>
   <p class="sub">Nabertherm TOP100 — hvornår er det billigst at starte ovnen? Priser inkl. nettarif, Energinet-tariffer, elafgift og moms.</p>
