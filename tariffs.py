@@ -51,7 +51,7 @@ ELAFGIFT_ORE_INCL_MOMS = 1.0     # 0.8 øre excl. moms since 2026-01-01
 DSO_TARIFFS: dict[str, dict] = {
     "N1": {
         "area": "DK1",
-        "label": "N1 — store dele af Midt-, Syd- og Østjylland",
+        "label": "N1 — store dele af Jylland",
         "sommer": {"lavlast": 10.98, "hoejlast": 16.47, "spidslast": 42.83},
         "vinter": {"lavlast": 10.98, "hoejlast": 32.95, "spidslast": 98.84},
         "source": "n1.dk/priser-og-vilkar (C-kunde, gældende fra 1. jan. 2026); the page's "
