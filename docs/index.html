@@ -85,10 +85,10 @@
   <p class="sub">Nabertherm TOP100 — hvornår er det billigst at starte ovnen? Priser inkl. nettarif, Energinet-tariffer, elafgift og moms.</p>
 
   <div class="meta">
-    <span class="badge">Opdateret 07-10-2026 kl. 10:11</span>
+    <span class="badge">Opdateret 07-10-2026 kl. 10:15</span>
     <span class="badge">Kilde: Energi Data Service (Nord Pool spot)</span>
   </div>
-  
+  <div class="meta">Prisområde: <a class="badge" href="dk1.html">DK1 · Jylland/Fyn</a> <span class="badge"><b>DK2 · Sjælland ✓</b></span></div>
 
   
   <p class="note">Priser i morgen opdateres kl 13:00</p>
@@ -146,6 +146,8 @@
   <footer>
     <p>Programmer: Forglødning 13 timer / 29.7 kWh · Glasur 6 timer / 29.0 kWh. Beløbet pr. række er summen af timepris × forbrug for hele brændingen — en brænding der starter om aftenen prissættes med næste dags priser efter midnat.</p>
     <p>Nettarif Radius Elnet — København, Nordsjælland, dele af Midtsjælland: Lavlast kl. 00-06 13.27 øre · Højlast kl. 06-17 39.82 øre · Spidslast kl. 17-21 119.45 øre · Højlast kl. 21-24 39.82 øre (officiel sats fra Energi Data Service DataHub, kode DT_C_01, gældende 2026-10-01 til 2027-04-01). Energinet (system+transmission) 14.40 øre/kWh og elafgift 1.00 øre/kWh er ens hele døgnet. Alt er inkl. moms (spotprisen ganges med 1,25). Faste abonnementer (netabonnement, systemabonnement og elselskabets månedsgebyr) er ikke medregnet, fordi de ikke afhænger af, hvornår ovnen startes.</p>
+    <p>Beløbene er vejledende: nettariffen er ét netselskabs sats for området. Har du et andet
+       netselskab, afviger prisen.</p>
   </footer>
 </div>
 
@@ -263,6 +265,15 @@
     }
   }
 
+  function reorderCards() {
+    var box = document.querySelector(".kpis");
+    if (!box) return;
+    ["b_today", "g_today", "b_tom", "g_tom"].forEach(function (key) {
+      var card = box.querySelector('.kpi[data-key="' + key + '"]');
+      if (card) box.appendChild(card);      // appendChild moves the node, so this re-sorts them
+    });
+  }
+
   function maybeRoll(now) {
     if (rolled) return false;                            // only ever one day
     if (now.date !== shiftDate(data.date, 1)) return false;
@@ -273,6 +284,7 @@
     }
     swapColumns();
     promoteCards();
+    reorderCards();                                      // i dag first, i morgen after it
     window.kilnSeries = data.tomorrow || null;            // the series follow the columns
     shownDate = shiftDate(data.date, 1);
     rolled = true;
