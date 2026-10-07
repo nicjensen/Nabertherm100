@@ -142,13 +142,13 @@ and Radius are in `tariffs.py` so far; add yours from the company's own price li
 ## Deploy to GitHub Pages
 
 1. **Create the repo** — public is simplest (Pages is free there):
-   `nicjensen/kiln-prices` (any name will do).
+   `nicjensen/Nabertherm100` (any name will do).
 2. **Push this folder** to `main` (any account or token with access to that one repo).
 3. **Turn Pages on** once: *Settings → Pages → Source: Deploy from a branch →
    Branch: `main`, folder: `/docs` → Save*.
    (Or set it in one API call — see below.)
 4. The workflow then runs once a day (13:15 local) and on every push, rebuilds `docs/`, and
-   commits when anything changed. The site lands at `https://nicjensen.github.io/kiln-prices/`.
+   commits when anything changed. The site lands at `https://nicjensen.github.io/Nabertherm100/`.
 
 One-time Pages setup via API, if you would rather not click:
 
@@ -156,7 +156,7 @@ One-time Pages setup via API, if you would rather not click:
 TOKEN=$GITHUB_TOKEN    # a fine-grained PAT with Pages: write, scoped to this repo only
 curl -s -X POST -H "Authorization: Bearer $TOKEN" \
      -H "Accept: application/vnd.github+json" \
-     https://api.github.com/repos/nicjensen/kiln-prices/pages \
+     https://api.github.com/repos/nicjensen/Nabertherm100/pages \
      -d '{"source":{"branch":"main","path":"/docs"}}'
 ```
 

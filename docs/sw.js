@@ -6,7 +6,7 @@
  * is online) and everything else cache-first. Only same-origin requests are touched: the
  * page's own links out, and any API call, are left alone.
  *
- * Paths are relative, so the site works under any repo subpath (e.g. /kiln-prices/).
+ * Paths are relative, so the site works under any repo subpath (e.g. /Nabertherm100/).
  */
 const CACHE = "kiln-v1";
 const ROOT = new URL("./", self.location).href;
