@@ -15,162 +15,193 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ovnpriser">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d2129; --line:#2a2f3a;
-    --fg:#e8eaf0; --muted:#9aa3b2; --best:#2fbf71; --best-bg:rgba(47,191,113,.14);
-    --second:#e2b93b; --second-bg:rgba(226,185,59,.13); --accent:#ff8a3d;
+    --bg:#0e1116; --card:#171b22; --card2:#1e232c; --line:#2b323d; --fg:#e9ecf2; --muted:#98a2b3;
+    --best:#3ecf8e; --second:#e8c352; --accent:#ff8a3d;
+    --best-bg:rgba(62,207,142,.16); --second-bg:rgba(232,195,82,.14);
+    --day2:rgba(255,255,255,.03); --divider:#3b4557; --dash:#4d5663; --hero-a:#1b2a24; --hero-b:#171b22;
   }
   @media (prefers-color-scheme: light){
-    :root{ --bg:#f5f6f8; --card:#ffffff; --card2:#f0f2f5; --line:#dde1e8; --fg:#15181d;
-           --muted:#5d6675; --best:#1d8f52; --best-bg:rgba(29,143,82,.12);
-           --second:#9a7a12; --second-bg:rgba(154,122,18,.12); --accent:#c25a1a; }
+    :root{ --bg:#f5f6f8; --card:#ffffff; --card2:#f0f2f5; --line:#e1e5ec; --fg:#15181d; --muted:#5d6675;
+           --best:#12784a; --second:#8a6a0e; --accent:#c25a1a;
+           --best-bg:rgba(18,120,74,.13); --second-bg:rgba(138,106,14,.12);
+           --day2:rgba(0,0,0,.03); --divider:#ccd3de; --dash:#b6bec9; --hero-a:#eaf6ef; --hero-b:#ffffff; }
   }
   *{box-sizing:border-box}
-  body{margin:0;padding:calc(24px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right))
-       calc(56px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
-       background:var(--bg);color:var(--fg);
-       font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:960px;margin:0 auto}
-  h1{font-size:1.55rem;margin:0 0 4px;letter-spacing:-.01em}
-  h1 .f{color:var(--accent)}
-  .sub{color:var(--muted);margin:0 0 18px;font-size:.95rem}
-  .meta{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;color:var(--muted);
-        font-size:.82rem;margin-bottom:18px}
-  .badge{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
-  .note{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);
-        border-radius:10px;padding:10px 14px;margin:0 0 20px;font-size:.9rem}
-  .alert{background:rgba(226,185,59,.12);border:1px solid var(--second);color:var(--fg);
-         border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:.92rem}
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-  .kpi .k{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
-  .kpi .h{font-size:1.5rem;font-weight:650;font-variant-numeric:tabular-nums}
-  .kpi .v{color:var(--muted);font-size:.88rem;margin-top:2px}
-  .kpi.pending .h{font-size:1rem;font-weight:500;color:var(--muted)}
-  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);
-        border:1px solid var(--line);border-radius:12px;overflow:hidden;font-variant-numeric:tabular-nums}
-  caption{caption-side:top;text-align:left;color:var(--muted);font-size:.85rem;padding:0 0 8px}
-  th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line);font-size:.94rem}
-  thead th{background:var(--card2);color:var(--fg);font-size:.78rem;text-transform:uppercase;
-           letter-spacing:.05em;font-weight:600;text-align:right;white-space:nowrap}
-  thead th:first-child,th[scope=row]{text-align:left}
-  tbody tr:last-child th,tbody tr:last-child td{border-bottom:none}
-  th[scope=row]{font-weight:600;color:var(--muted)}
-  td.best{background:var(--best-bg);color:var(--best);font-weight:700}
-  td.second{background:var(--second-bg);color:var(--second);font-weight:700}
-  td.na{color:var(--muted);opacity:.5}
-  .kpi.elapsed{display:none}
-  .kpi.alternative .k{color:var(--accent)}
-  tbody tr:hover td,tbody tr:hover th{background:var(--card2)}
-  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.82rem;margin:12px 0 0}
-  .legend b{color:var(--fg);font-weight:600}
-  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+  header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+         padding:calc(12px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 12px
+                 calc(16px + env(safe-area-inset-left))}
+  header h1{margin:0;font-size:1.05rem;letter-spacing:-.01em}
+  header h1 .f{color:var(--accent)}
+  .metaline{margin:3px 0 0;color:var(--muted);font-size:.78rem}
+  main{max-width:640px;margin:0 auto;padding:16px calc(14px + env(safe-area-inset-right)) 0
+       calc(14px + env(safe-area-inset-left))}
+  .sub{color:var(--muted);margin:0 0 14px;font-size:.88rem}
+  .areas{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .areas .badge,.areas a{font-size:.78rem;border-radius:999px;padding:4px 11px;border:1px solid var(--line);
+                         background:var(--card2);color:var(--muted);text-decoration:none}
+  .areas .badge b,.areas a b{color:var(--fg)}
+  .alert{background:var(--second-bg);border:1px solid var(--second);border-radius:12px;
+         padding:11px 13px;margin:0 0 14px;font-size:.86rem}
+  .hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:0 0 16px}
+  .hero-tile{background:linear-gradient(160deg,var(--hero-a),var(--hero-b));border:1px solid var(--line);
+             border-radius:16px;padding:15px 16px}
+  .hero-tile.muted{background:var(--card)}
+  .hero-tile[hidden]{display:none}
+  .hero-tile .n{margin:0;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+                color:var(--muted);font-weight:700}
+  .hero-tile .v{margin:5px 0 2px;font-size:2.2rem;font-weight:750;letter-spacing:-.03em;
+                color:var(--best);font-variant-numeric:tabular-nums}
+  .hero-tile .v span{font-size:.85rem;color:var(--muted);margin-left:4px;font-weight:600}
+  .hero-tile.muted .v{color:var(--muted);font-size:1.5rem;font-weight:600}
+  .hero-tile .m{margin:0;font-size:.78rem;color:var(--muted)}
+  .hero-tile.alt .m{color:var(--accent)}
+  table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;background:var(--card);
+        border:1px solid var(--line);border-radius:16px;overflow:hidden;font-variant-numeric:tabular-nums}
+  thead th{background:var(--card2);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;
+           color:var(--muted);font-weight:700;padding:8px 6px;text-align:center;white-space:nowrap}
+  thead tr.grp th{font-size:.82rem;color:var(--fg);text-transform:none;letter-spacing:0;padding:11px 6px}
+  thead tr.grp th.d2{background:var(--day2);border-left:2px solid var(--divider)}
+  thead tr.grp th span{display:block;color:var(--muted);font-size:.68rem;font-weight:500;margin-top:1px}
+  .pill{display:inline-block;margin-top:5px;font-size:.62rem;font-weight:650;color:var(--muted);
+        background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:2px 6px}
+  .pill.ok{color:var(--best);border-color:var(--best);background:var(--best-bg)}
+  tbody th,tbody td{padding:9px 6px;text-align:center;border-top:1px solid var(--line);font-size:.92rem}
+  tbody th{text-align:left;padding-left:12px;color:var(--muted);font-weight:700;font-size:.9rem;
+           width:24%;white-space:nowrap}
+  tbody td.v{font-weight:600}
+  tbody td.dash{color:var(--dash);font-weight:400}
+  /* tomorrow's two columns carry their own tint and a firm divider, so the eye reads two days
+     in one grid rather than six loose columns */
+  tbody td:nth-child(4),tbody td:nth-child(5){background:var(--day2)}
+  tbody td:nth-child(4){border-left:2px solid var(--divider)}
+  tbody td.best{background:var(--best-bg);color:var(--best);font-weight:750}
+  tbody td.second{background:var(--second-bg);color:var(--second);font-weight:750}
+  tbody tr.now th{box-shadow:inset 3px 0 0 var(--accent);color:var(--fg)}
+  .note{color:var(--muted);font-size:.78rem;margin:10px 2px 0}
+  .note[hidden]{display:none}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.78rem;margin:14px 2px 0}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:0}
   .dot.b{background:var(--best)} .dot.s{background:var(--second)}
-  footer{margin-top:28px;color:var(--muted);font-size:.82rem}
-  footer p{margin:6px 0}
-  footer code{background:var(--card2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:.85em}
-  a{color:var(--accent)}
-  .install-hint{display:none;background:var(--card);border:1px solid var(--line);
-                border-radius:10px;padding:10px 14px;margin:0 0 20px;font-size:.85rem;color:var(--muted)}
+  details{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:14px;
+          padding:12px 14px}
+  summary{cursor:pointer;font-weight:650;font-size:.88rem}
+  details p{color:var(--muted);font-size:.8rem;margin:10px 0 0}
+  .disclaimer{color:var(--muted);font-size:.76rem;margin:14px 2px 0}
+  .install-hint{display:none;background:var(--card);border:1px solid var(--line);border-radius:12px;
+                padding:10px 14px;margin:16px 0 0;font-size:.82rem;color:var(--muted)}
   .install-hint b{color:var(--fg)}
+  footer{color:var(--muted);font-size:.76rem;margin:18px 2px 0}
 </style>
 </head>
 <body data-build-date="2026-10-07">
-<div class="wrap">
+<header>
   <h1><span class="f">🔥</span> Priser på Forglødning og Glasurbrænding</h1>
+  <p class="metaline">DK1 · N1 Elnet · opdateret 07-10-2026 kl. 13:26</p>
+</header>
+<main>
   <p class="sub">Nabertherm TOP100 — hvornår er det billigst at starte ovnen? Priser inkl. nettarif, Energinet-tariffer, elafgift og moms.</p>
-
-  <div class="meta">
-    <span class="badge">Opdateret 07-10-2026 kl. 10:25</span>
-    <span class="badge">Kilde: Energi Data Service (Nord Pool spot)</span>
-  </div>
-  <div class="meta">Prisområde: <span class="badge"><b>DK1 · Jylland/Fyn ✓</b></span> <a class="badge" href="dk2.html">DK2 · Sjælland</a></div>
-
+  <div class="areas"><div class="meta">Prisområde: <span class="badge"><b>DK1 · Jylland/Fyn ✓</b></span> <a class="badge" href="dk2.html">DK2 · Sjælland</a></div></div>
   
-  <p class="note">Priser i morgen opdateres kl 13:00</p>
+
+  <div class="hero"><div class="hero-tile" data-key="b" data-prog="Forglødning" data-spec="29,7 kWh"><p class="n">Forglødning</p><p class="v">64<span>kr</span></p><p class="m">billigste start i dag kl. 04:00 · 29,7 kWh</p></div><div class="hero-tile" data-key="g" data-prog="Glasur" data-spec="29,0 kWh"><p class="n">Glasur</p><p class="v">54<span>kr</span></p><p class="m">billigste start i dag kl. 10:00 · 29,0 kWh</p></div></div>
   <p class="note" id="roll-note" hidden></p>
 
-  <div class="kpis"><div class="kpi" data-day="today" data-key="b_today" data-hour="4" data-label="I dag · Forglødning" data-kwh="29.7"><div class="k">I dag · Forglødning</div><div class="h">04:00</div><div class="v">64 kr. · 29.7 kWh</div></div><div class="kpi" data-day="today" data-key="g_today" data-hour="10" data-label="I dag · Glasur" data-kwh="29.0"><div class="k">I dag · Glasur</div><div class="h">10:00</div><div class="v">54 kr. · 29.0 kWh</div></div><div class="kpi pending" data-day="tomorrow" data-key="b_tom"><div class="k">I morgen · Forglødning</div><div class="h">Priser ikke offentliggjort endnu</div><div class="v">offentliggøres kl. 13:00</div></div><div class="kpi pending" data-day="tomorrow" data-key="g_tom"><div class="k">I morgen · Glasur</div><div class="h">Priser ikke offentliggjort endnu</div><div class="v">offentliggøres kl. 13:00</div></div></div>
-
-  <div class="scroll">
   <table>
-    <caption>Starttidspunkt = den time ovnen tændes. Beløbet er den samlede elpris for hele brændingen.</caption>
     <thead>
+      <tr class="grp">
+        <th></th>
+        <th colspan="2" data-daycell="today">I dag<span>07-10-2026</span></th>
+        <th colspan="2" class="d2" data-daycell="tomorrow">I morgen<span>08-10-2026</span><span class="pill">kl. 13:00</span></th>
+      </tr>
       <tr>
-        <th scope="col">🕒 Start</th>
-        <th scope="col" data-day="today" data-prog="biscuit">I dag<br>Forglødning</th>
-        <th scope="col" data-day="today" data-prog="glaze">I dag<br>Glasur</th>
-        <th scope="col" data-day="tomorrow" data-prog="biscuit">I morgen<br>Forglødning</th>
-        <th scope="col" data-day="tomorrow" data-prog="glaze">I morgen<br>Glasur</th>
+        <th scope="col">Start</th>
+        <th scope="col">F</th><th scope="col">G</th>
+        <th scope="col">F</th><th scope="col">G</th>
       </tr>
     </thead>
     <tbody>
-    <tr><th scope="row">00:00</th><td data-day="today" data-prog="biscuit">69 kr.</td><td data-day="today" data-prog="glaze">58 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">01:00</th><td data-day="today" data-prog="biscuit">67 kr.</td><td data-day="today" data-prog="glaze">62 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">02:00</th><td data-day="today" data-prog="biscuit">66 kr.</td><td data-day="today" data-prog="glaze">70 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">03:00</th><td class="second" data-day="today" data-prog="biscuit"><strong>65 kr.</strong></td><td data-day="today" data-prog="glaze">76 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">04:00</th><td class="best" data-day="today" data-prog="biscuit"><strong>64 kr.</strong></td><td data-day="today" data-prog="glaze">78 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">05:00</th><td class="second" data-day="today" data-prog="biscuit"><strong>65 kr.</strong></td><td data-day="today" data-prog="glaze">75 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">06:00</th><td data-day="today" data-prog="biscuit">70 kr.</td><td data-day="today" data-prog="glaze">71 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">07:00</th><td data-day="today" data-prog="biscuit">73 kr.</td><td data-day="today" data-prog="glaze">65 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">08:00</th><td data-day="today" data-prog="biscuit">75 kr.</td><td data-day="today" data-prog="glaze">59 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">09:00</th><td data-day="today" data-prog="biscuit">76 kr.</td><td class="second" data-day="today" data-prog="glaze"><strong>55 kr.</strong></td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">10:00</th><td data-day="today" data-prog="biscuit">75 kr.</td><td class="best" data-day="today" data-prog="glaze"><strong>54 kr.</strong></td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">11:00</th><td data-day="today" data-prog="biscuit">74 kr.</td><td data-day="today" data-prog="glaze">56 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">12:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">65 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">13:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">76 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">14:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">86 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">15:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">90 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">16:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">85 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">17:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">79 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">18:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">69 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">19:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td class="na" data-day="today" data-prog="glaze">–</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">20:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td class="na" data-day="today" data-prog="glaze">–</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">21:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td class="na" data-day="today" data-prog="glaze">–</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">22:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td class="na" data-day="today" data-prog="glaze">–</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr><th scope="row">23:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td class="na" data-day="today" data-prog="glaze">–</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="00:00"><th scope="row">00:00</th><td class="v" data-day="today" data-prog="biscuit">69</td><td class="v" data-day="today" data-prog="glaze">58</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="01:00"><th scope="row">01:00</th><td class="v" data-day="today" data-prog="biscuit">67</td><td class="v" data-day="today" data-prog="glaze">62</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="02:00"><th scope="row">02:00</th><td class="v" data-day="today" data-prog="biscuit">66</td><td class="v" data-day="today" data-prog="glaze">70</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="03:00"><th scope="row">03:00</th><td class="v second" data-day="today" data-prog="biscuit">65</td><td class="v" data-day="today" data-prog="glaze">76</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="04:00"><th scope="row">04:00</th><td class="v best" data-day="today" data-prog="biscuit">64</td><td class="v" data-day="today" data-prog="glaze">78</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="05:00"><th scope="row">05:00</th><td class="v second" data-day="today" data-prog="biscuit">65</td><td class="v" data-day="today" data-prog="glaze">75</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="06:00"><th scope="row">06:00</th><td class="v" data-day="today" data-prog="biscuit">70</td><td class="v" data-day="today" data-prog="glaze">71</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="07:00"><th scope="row">07:00</th><td class="v" data-day="today" data-prog="biscuit">73</td><td class="v" data-day="today" data-prog="glaze">65</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="08:00"><th scope="row">08:00</th><td class="v" data-day="today" data-prog="biscuit">75</td><td class="v" data-day="today" data-prog="glaze">59</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="09:00"><th scope="row">09:00</th><td class="v" data-day="today" data-prog="biscuit">76</td><td class="v second" data-day="today" data-prog="glaze">55</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="10:00"><th scope="row">10:00</th><td class="v" data-day="today" data-prog="biscuit">75</td><td class="v best" data-day="today" data-prog="glaze">54</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="11:00"><th scope="row">11:00</th><td class="v" data-day="today" data-prog="biscuit">74</td><td class="v" data-day="today" data-prog="glaze">56</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="12:00"><th scope="row">12:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">65</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="13:00"><th scope="row">13:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">76</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="14:00"><th scope="row">14:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">86</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="15:00"><th scope="row">15:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">90</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="16:00"><th scope="row">16:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">85</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="17:00"><th scope="row">17:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">79</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="18:00"><th scope="row">18:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">69</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="19:00"><th scope="row">19:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v dash" data-day="today" data-prog="glaze">–</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="20:00"><th scope="row">20:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v dash" data-day="today" data-prog="glaze">–</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="21:00"><th scope="row">21:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v dash" data-day="today" data-prog="glaze">–</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="22:00"><th scope="row">22:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v dash" data-day="today" data-prog="glaze">–</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="23:00"><th scope="row">23:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v dash" data-day="today" data-prog="glaze">–</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
     </tbody>
   </table>
-  </div>
+
+  <p class="note" id="tom-note">Morgendagens 24 timer står i tabellen med –, og de fyldes ud, så snart priserne offentliggøres ca. kl. 13:00.</p>
 
   <div class="legend">
-    <span><span class="dot b"></span><b>Billigste</b> starttidspunkt</span>
-    <span><span class="dot s"></span><b>Næstbilligste</b></span>
-    <span>– uden for programmets længde</span>
+    <span><span class="dot b"></span>Billigste start</span>
+    <span><span class="dot s"></span>Næstbilligste</span>
+    <span>F = Forglødning · G = Glasur</span>
+    <span>Beløb i kr. · – kan ikke prissættes endnu</span>
   </div>
 
-  <footer>
+  <details>
+    <summary>Sådan er tallene regnet ud</summary>
     <p>Programmer: Forglødning 13 timer / 29.7 kWh · Glasur 6 timer / 29.0 kWh. Beløbet pr. række er summen af timepris × forbrug for hele brændingen — en brænding der starter om aftenen prissættes med næste dags priser efter midnat.</p>
     <p>Nettarif N1 — store dele af Jylland: Lavlast kl. 00-06 10.98 øre · Højlast kl. 06-17 32.95 øre · Spidslast kl. 17-21 98.84 øre · Højlast kl. 21-24 32.95 øre (officiel sats fra Energi Data Service DataHub, kode CD, gældende 2026-10-01 til 2027-01-01). Energinet (system+transmission) 14.40 øre/kWh og elafgift 1.00 øre/kWh er ens hele døgnet. Alt er inkl. moms (spotprisen ganges med 1,25). Faste abonnementer (netabonnement, systemabonnement og elselskabets månedsgebyr) er ikke medregnet, fordi de ikke afhænger af, hvornår ovnen startes.</p>
-    <p>Beløbene er vejledende: nettariffen er ét netselskabs sats for området. Har du et andet
-       netselskab, afviger prisen.</p>
-  </footer>
-</div>
+  </details>
 
-<script id="kiln-kpi-data" type="application/json">{"date": "2026-10-07", "past": "hide", "today": {"b_today": [[0, 69], [1, 67], [2, 66], [3, 65], [4, 64], [5, 65], [6, 70], [7, 73], [8, 75], [9, 76], [10, 75], [11, 74]], "g_today": [[0, 58], [1, 62], [2, 70], [3, 76], [4, 78], [5, 75], [6, 71], [7, 65], [8, 59], [9, 55], [10, 54], [11, 56], [12, 65], [13, 76], [14, 86], [15, 90], [16, 85], [17, 79], [18, 69]]}, "tomorrow": {"b_today": [], "g_today": []}}</script>
+  <p class="disclaimer">Beløbene er vejledende: nettariffen er ét netselskabs sats for området.
+     Har du et andet netselskab, afviger prisen.</p>
+
+  <p class="install-hint" id="install-hint">
+    <b>Få den på hjemmeskærmen:</b> tryk <b>Del</b> (firkanten med pilen op) → <b>Føj til
+    hjemmeskærm</b>. Så åbner den som en app, og de sidste kendte priser virker også uden
+    netforbindelse.
+  </p>
+</main>
+
+<script id="kiln-data" type="application/json">{"date": "2026-10-07", "past": "hide", "today": {"b_today": [[0, 69], [1, 67], [2, 66], [3, 65], [4, 64], [5, 65], [6, 70], [7, 73], [8, 75], [9, 76], [10, 75], [11, 74]], "g_today": [[0, 58], [1, 62], [2, 70], [3, 76], [4, 78], [5, 75], [6, 71], [7, 65], [8, 59], [9, 55], [10, 54], [11, 56], [12, 65], [13, 76], [14, 86], [15, 90], [16, 85], [17, 79], [18, 69]]}, "tomorrow": {"b_today": [], "g_today": []}, "cheapest": {"b_today": {"hour": "04:00", "value": 64}, "g_today": {"hour": "10:00", "value": 54}, "b_tom": null, "g_tom": null}, "kwh": {"b": 29.7, "g": 29.0}}</script>
 <script>
-/* Day rollover, done by the browser.
+/* Everything time-dependent happens here, in the viewer's browser, against Copenhagen time:
  *
- * The page is a snapshot, rebuilt once a day shortly after the afternoon publication of
- * tomorrow's prices. So nothing needs to be rebuilt at midnight: the columns can simply
- * change places. The numbers in the "i morgen" columns were computed by exactly the same
- * server-side code as the "i dag" ones, so this recalculates nothing — it moves the two
- * column pairs, relabels them, and lets "i morgen" wait for the next publication. Doing it
- * here also means the rollover cannot be missed by a skipped GitHub run.
+ *  - "now" row marker;
+ *  - the day rollover at midnight. The page is a snapshot, rebuilt once a day after the
+ *    afternoon publication, so nothing needs rebuilding at midnight: tomorrow's cells are
+ *    already computed (by the same server-side code) and can simply become today's, while the
+ *    tomorrow columns empty back to dashes. Doing it here means a skipped CI run cannot leave
+ *    the site calling yesterday "i dag";
+ *  - the two recommendation tiles: an optimum whose start hour has passed is dropped
+ *    (kpi_past: "hide") or re-pointed to the cheapest start still available ("remaining");
+ *  - and a note when the page is too old to tell which day it is showing.
  */
 (function () {
-  var source = document.getElementById("kiln-kpi-data");
+  var source = document.getElementById("kiln-data");
   if (!source) return;
   var data = JSON.parse(source.textContent);
-  var shownDate = data.date;         // the day the "i dag" columns stand for
+  var MODE = data.past || "hide";
+  var shownDate = data.date;                 // the day the "i dag" columns stand for
   var rolled = false;
 
-  var DAY = { today: "I dag", tomorrow: "I morgen" };
-  var PROG = { biscuit: "Forglødning", glaze: "Glasur" };
+  var tiles = [].slice.call(document.querySelectorAll(".hero-tile"));
 
   function nowInCopenhagen() {
     var parts = new Intl.DateTimeFormat("en-GB", {
@@ -197,152 +228,19 @@
     return p[2] + "-" + p[1] + "-" + p[0];
   }
 
-  function noteEl() { return document.getElementById("roll-note"); }
+  function hhmm(hourIndex) { return ("0" + hourIndex).slice(-2) + ":00"; }
 
   function say(text, force) {
-    var el = noteEl();
+    var el = document.getElementById("roll-note");
     if (!el) return;
     if (!force && el.textContent) return;      // the more specific message wins
     el.textContent = text;
     el.hidden = !text;
   }
 
-  function tomorrowHasNumbers() {
-    var cells = document.querySelectorAll('tbody td[data-day="tomorrow"]');
-    for (var i = 0; i < cells.length; i++) {
-      if (cells[i].className !== "na") return true;
-    }
-    return false;
-  }
-
-  function relabel(el) {
-    el.innerHTML = DAY[el.getAttribute("data-day")] + "<br>" + PROG[el.getAttribute("data-prog")];
-  }
-
-  function swapColumns() {
-    var rows = document.querySelectorAll("thead tr, tbody tr");
-    for (var i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      if (row.children.length !== 5) continue;
-      var old = [row.children[1], row.children[2]];      // currently "i dag"
-      var next = [row.children[3], row.children[4]];     // currently "i morgen"
-      row.insertBefore(next[0], old[0]);
-      row.insertBefore(next[1], old[0]);
-      var head = row.parentNode.tagName === "THEAD";
-      [next[0], next[1]].forEach(function (el) {          // the new day
-        el.setAttribute("data-day", "today");
-        if (head) relabel(el);
-      });
-      [old[0], old[1]].forEach(function (el) {            // emptied until the next publication
-        el.setAttribute("data-day", "tomorrow");
-        if (head) { relabel(el); }
-        else { el.className = "na"; el.textContent = "–"; }
-      });
-    }
-  }
-
-  function promoteCards() {
-    var cards = document.querySelectorAll(".kpis .kpi");
-    for (var i = 0; i < cards.length; i++) {
-      var card = cards[i];
-      var key = card.getAttribute("data-key") || "";
-      var prog = key.indexOf("g_") === 0 ? "glaze" : "biscuit";
-      if (card.getAttribute("data-day") === "tomorrow") {
-        card.setAttribute("data-day", "today");           // its numbers already are today's
-        card.setAttribute("data-key", prog === "glaze" ? "g_today" : "b_today");
-        card.setAttribute("data-label", "I dag · " + PROG[prog]);
-        card.querySelector(".k").textContent = "I dag · " + PROG[prog];
-      } else {
-        card.className = "kpi pending";
-        card.setAttribute("data-day", "tomorrow");
-        card.setAttribute("data-key", prog === "glaze" ? "g_tom" : "b_tom");
-        card.removeAttribute("data-hour");
-        card.removeAttribute("data-kwh");
-        card.querySelector(".k").textContent = "I morgen · " + PROG[prog];
-        card.querySelector(".h").textContent = "Priser ikke offentliggjort endnu";
-        card.querySelector(".v").textContent = "offentliggøres kl. 13:00";
-      }
-    }
-  }
-
-  function reorderCards() {
-    var box = document.querySelector(".kpis");
-    if (!box) return;
-    ["b_today", "g_today", "b_tom", "g_tom"].forEach(function (key) {
-      var card = box.querySelector('.kpi[data-key="' + key + '"]');
-      if (card) box.appendChild(card);      // appendChild moves the node, so this re-sorts them
-    });
-  }
-
-  function maybeRoll(now) {
-    if (rolled) return false;                            // only ever one day
-    if (now.date !== shiftDate(data.date, 1)) return false;
-    if (!tomorrowHasNumbers()) {
-      say("Siden er bygget " + dkDate(data.date) + ", før morgendagens priser blev " +
-          "offentliggjort. Tallene nedenfor er derfor for " + dkDate(data.date) + ".", true);
-      return false;
-    }
-    swapColumns();
-    promoteCards();
-    reorderCards();                                      // i dag first, i morgen after it
-    window.kilnSeries = data.tomorrow || null;            // the series follow the columns
-    shownDate = shiftDate(data.date, 1);
-    rolled = true;
-    say("Morgendagens priser er ikke offentliggjort endnu (de kommer ca. kl. 13:00). " +
-        "Tallene for i dag er dagens priser.", true);
-    return true;
-  }
-
-  function maybeStale(now) {
-    if (now.date <= shownDate) return false;             // still the day we are showing
-    var cards = document.querySelectorAll(".kpis .kpi");
-    for (var i = 0; i < cards.length; i++) cards[i].classList.add("elapsed");
-    say("Siden er ikke blevet opdateret siden " + dkDate(shownDate) +
-        ", så dagens og morgendagens tal kendes ikke.", false);
-    return true;
-  }
-
-  window.kilnToday = nowInCopenhagen;
-  window.kilnRollover = maybeRoll;      // tests drive the rollover with a synthetic clock
-
-  var boot = nowInCopenhagen();
-  maybeRoll(boot);
-  maybeStale(boot);
-  window.kilnShownDate = shownDate;
-
-  setInterval(function () {
-    var now = nowInCopenhagen();
-    maybeRoll(now);                                      // a page left open crosses midnight
-    maybeStale(now);
-    window.kilnShownDate = shownDate;
-    if (window.kilnApplyKpi) window.kilnApplyKpi(now);
-  }, 60000);
-})();
-</script>
-<script>
-/* A "cheapest today" card is only useful while its start hour is still ahead. The page is a
-   snapshot (rebuilt once a day, after the afternoon publication), so the check runs here, in
-   the viewer's browser, against Copenhagen time — not at build time. A start hour counts as
-   still available through the end of that clock hour. */
-(function () {
-  var data = JSON.parse(document.getElementById("kiln-kpi-data").textContent);
-  var MODE = data.past || "hide";          // "hide" | "remaining" (config: kpi_past)
-
-  function nowInCopenhagen() {
-    var parts = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Europe/Copenhagen", year: "numeric", month: "2-digit",
-      day: "2-digit", hour: "2-digit", hour12: false
-    }).formatToParts(new Date());
-    var pick = function (type) {
-      for (var i = 0; i < parts.length; i++) { if (parts[i].type === type) return parts[i].value; }
-      return "";
-    };
-    return { date: pick("year") + "-" + pick("month") + "-" + pick("day"),
-             hour: parseInt(pick("hour"), 10) % 24 };
-  }
-
   function cheapestRemaining(series, fromHour) {
     var best = null;
+    if (!series) return null;
     series.forEach(function (pair) {
       if (pair[0] < fromHour) return;
       if (!best || pair[1] < best[1]) best = pair;
@@ -350,56 +248,130 @@
     return best;
   }
 
-  var cards = [].slice.call(document.querySelectorAll('.kpi[data-day="today"]'));
-  cards.forEach(function (card) {                 // keep the built state to restore from
-    card.setAttribute("data-orig-k", card.querySelector(".k").textContent);
-    card.setAttribute("data-orig-h", card.querySelector(".h").textContent);
-    card.setAttribute("data-orig-v", card.querySelector(".v").textContent);
-  });
+  /* ---- the two recommendation tiles ------------------------------------------------ */
 
-  function restore(card) {
-    card.classList.remove("elapsed", "alternative");
-    card.querySelector(".k").textContent = card.getAttribute("data-orig-k");
-    card.querySelector(".h").textContent = card.getAttribute("data-orig-h");
-    card.querySelector(".v").textContent = card.getAttribute("data-orig-v");
+  function tileKey(tile) { return tile.getAttribute("data-key"); }           // "b" | "g"
+
+  function tileSpec(tile) {
+    var kwh = (data.kwh || {})[tileKey(tile)];
+    return kwh ? kwh.toFixed(1).replace(".", ",") + " kWh" : "";
   }
 
-  function apply(now) {
-    now = now || nowInCopenhagen();
-    var stale = now.date !== (window.kilnShownDate || data.date);   // no longer the shown day
-    cards.forEach(function (card) {
-      restore(card);                            // idempotent: never stack a decision
-      var built = card.getAttribute("data-hour");
-      if (built === null) return;               // pending / no data
-      if (!stale && now.hour <= parseInt(built, 10)) return;
-      var kpiKey = card.getAttribute("data-key");
-      var series = (window.kilnSeries && window.kilnSeries[kpiKey]) || (data.today || {})[kpiKey];
-      var alt = (!stale && MODE === "remaining" && series)
-        ? cheapestRemaining(series, now.hour) : null;
-      if (alt) {
-        card.classList.add("alternative");
-        card.querySelector(".k").textContent = card.getAttribute("data-label") + " · billigste tilbage";
-        card.querySelector(".h").textContent = ("0" + alt[0]).slice(-2) + ":00";
-        card.querySelector(".v").textContent = alt[1] + " kr. · " + card.getAttribute("data-kwh") + " kWh";
-      } else {
-        card.classList.add("elapsed");
+  function tileShow(tile, value, hourIndex, when) {
+    tile.hidden = false;
+    tile.classList.remove("muted", "alt");
+    tile.querySelector(".v").innerHTML = value + "<span>kr</span>";
+    var spec = tileSpec(tile);
+    tile.querySelector(".m").textContent = when + " kl. " + hhmm(hourIndex)
+      + (spec ? " · " + spec : "");
+  }
+
+  function tilePending(tile, text) {
+    tile.hidden = false;
+    tile.classList.add("muted");
+    tile.classList.remove("alt");
+    tile.querySelector(".v").innerHTML = "–";
+    var spec = tileSpec(tile);
+    tile.querySelector(".m").textContent = text + (spec ? " · " + spec : "");
+  }
+
+  function renderTiles(now) {
+    var stale = now.date !== shownDate;
+    tiles.forEach(function (tile) {
+      var key = tileKey(tile);
+      var prog = key === "b" ? "Forglødning" : "Glasur";
+      var best = (data.cheapest || {})[key + "_today"];
+      if (stale) { tilePending(tile, "priserne er forældede"); return; }
+      if (!best) { tilePending(tile, "offentliggøres ca. kl. 13:00"); return; }
+      var hourIndex = parseInt(best.hour.slice(0, 2), 10);
+      if (now.hour <= hourIndex) {                       // still ahead of us
+        tileShow(tile, best.value, hourIndex, "billigste start i dag");
+        return;
       }
+      if (MODE === "remaining") {
+        var alt = cheapestRemaining((data["today"] || {})[key + "_today"], now.hour);
+        if (alt) { tileShow(tile, alt[1], alt[0], "billigste tilbage i dag"); tile.classList.add("alt"); return; }
+      }
+      tile.hidden = true;                                // "hide": a passed optimum is noise
     });
   }
 
-  window.kilnApplyKpi = apply;    // exposed so the check can be driven at any hour in tests
-  apply();
-  setInterval(apply, 60000);      // a page left open crosses hours: re-check every minute
+  /* ---- midnight rollover ----------------------------------------------------------- */
+
+  function tomorrowHasNumbers() {
+    var cells = document.querySelectorAll('tbody td[data-day="tomorrow"]');
+    for (var i = 0; i < cells.length; i++) {
+      if (cells[i].className.indexOf("dash") === -1) return true;
+    }
+    return false;
+  }
+
+  function roll(now) {
+    if (rolled) return false;
+    if (now.date !== shiftDate(data.date, 1)) return false;
+    if (!tomorrowHasNumbers()) {
+      say("Siden er bygget " + dkDate(data.date) + ", før morgendagens priser blev offentliggjort. "
+          + "Tallene nedenfor er derfor for " + dkDate(data.date) + ".", true);
+      return false;
+    }
+    var rows = document.querySelectorAll("tbody tr");
+    for (var i = 0; i < rows.length; i++) {
+      var td = rows[i].querySelectorAll("td");
+      if (td.length !== 4) continue;
+      td[0].textContent = td[2].textContent; td[0].className = td[2].className;   // tomorrow -> today
+      td[1].textContent = td[3].textContent; td[1].className = td[3].className;
+      td[2].textContent = "–"; td[2].className = "v dash";                        // and empty it
+      td[3].textContent = "–"; td[3].className = "v dash";
+    }
+    document.querySelector('[data-daycell="today"] span').textContent = dkDate(shiftDate(data.date, 1));
+    document.querySelector('[data-daycell="tomorrow"] span').textContent = dkDate(shiftDate(data.date, 2));
+    var pill = document.querySelector('[data-daycell="tomorrow"] .pill');
+    if (pill) { pill.className = "pill"; pill.textContent = "kl. 13:00"; }
+    var note = document.getElementById("tom-note");
+    if (note) { note.hidden = false; }
+
+    var old = data.cheapest || {};
+    data.cheapest = { b_today: old.b_tom || null, g_today: old.g_tom || null, b_tom: null, g_tom: null };
+    data.today = data.tomorrow || null;                  // the series follow the columns
+    data.tomorrow = null;
+    shownDate = shiftDate(data.date, 1);
+    window.kilnShownDate = shownDate;
+    rolled = true;
+    say("Morgendagens priser er ikke offentliggjort endnu (de kommer ca. kl. 13:00). "
+        + "Tallene i tabellen er dagens priser.", true);
+    return true;
+  }
+
+  function markNow(now) {
+    var rows = document.querySelectorAll("tbody tr");
+    for (var i = 0; i < rows.length; i++) {
+      var h = rows[i].getAttribute("data-hour") || "";
+      rows[i].classList.toggle("now", now.date === shownDate && parseInt(h.slice(0, 2), 10) === now.hour);
+    }
+  }
+
+  function maybeStale(now) {
+    if (now.date <= shownDate) return false;             // still the day we are showing
+    say("Siden er ikke blevet opdateret siden " + dkDate(shownDate) + ", så dagens tal kendes ikke.", false);
+    return true;
+  }
+
+  function tick(now) {
+    now = now || nowInCopenhagen();
+    roll(now);
+    markNow(now);
+    renderTiles(now);
+    maybeStale(now);
+  }
+
+  window.kilnToday = nowInCopenhagen;
+  window.kilnRollover = roll;          // tests drive the rollover with a synthetic clock
+  window.kilnTick = tick;
+
+  tick();
+  setInterval(tick, 60000);            // a page left open crosses hours, and midnight
 })();
 </script>
-
-<div class="wrap">
-  <p class="install-hint" id="install-hint">
-    <b>Få den på hjemmeskærmen:</b> tryk <b>Del</b> (firkanten med pilen op) → <b>Føj til
-    hjemmeskærm</b>. Så åbner den som en app, og de sidste kendte priser virker også uden
-    netforbindelse.
-  </p>
-</div>
 <script>
 /* Installable app: the service worker is what makes it work offline. It needs a secure
    context, so this is a no-op when the page is opened straight from disk. iOS gives no

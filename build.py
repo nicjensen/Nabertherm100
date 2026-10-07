@@ -71,41 +71,34 @@ def fetch_two_days(area: str, today: dt.date, cache_dir: str, refresh: bool):
     return [], [], None
 
 
-def kpi_html(label: str, best: dict | None, coeffs: list[float], pending: bool,
-             day: str, key: str) -> str:
-    """day/key/index/kwh ride along as data attributes: the page hides or re-points a card
-    client-side when its start hour has already passed by the time it is viewed."""
-    kwh = sum(coeffs)
-    if pending:
-        return (f'<div class="kpi pending" data-day="{day}" data-key="{key}">'
-                f'<div class="k">{label}</div>'
-                f'<div class="h">Priser ikke offentliggjort endnu</div>'
-                f'<div class="v">offentliggøres kl. 13:00</div></div>')
-    if best is None:
-        return (f'<div class="kpi pending" data-day="{day}" data-key="{key}">'
-                f'<div class="k">{label}</div>'
-                f'<div class="h">Ingen data</div><div class="v">–</div></div>')
-    return (f'<div class="kpi" data-day="{day}" data-key="{key}" data-hour="{best["index"]}"'
-            f' data-label="{label}" data-kwh="{kwh:.1f}">'
-            f'<div class="k">{label}</div>'
-            f'<div class="h">{best["hour"]}</div>'
-            f'<div class="v">{dkk(best["value"])} · {kwh:.1f} kWh</div></div>')
+def hero_tile(key: str, prog: str, best: dict | None, coeffs: list[float], pending: bool) -> str:
+    """One recommendation tile. The server renders today's state; the browser re-renders the
+    same tile from the embedded data at the day rollover and once an optimum's hour has passed."""
+    spec = f"{sum(coeffs):.1f} kWh".replace(".", ",")
+    if pending or best is None:
+        msg = "offentliggøres ca. kl. 13:00" if pending else "ingen data"
+        return (f'<div class="hero-tile muted" data-key="{key}" data-prog="{prog}" data-spec="{spec}">'
+                f'<p class="n">{prog}</p><p class="v">–</p>'
+                f'<p class="m">{msg} · {spec}</p></div>')
+    return (f'<div class="hero-tile" data-key="{key}" data-prog="{prog}" data-spec="{spec}">'
+            f'<p class="n">{prog}</p>'
+            f'<p class="v">{best["value"]:.0f}<span>kr</span></p>'
+            f'<p class="m">billigste start i dag kl. {best["hour"]} · {spec}</p></div>')
 
 
 def row_html(row: dict) -> str:
     def cell(key: str) -> str:
         c = row[key]
-        # day/programme ride along so the browser can move a whole column on the day rollover
+        # day/programme ride along so the browser can shift a whole column on the day rollover
         day = "today" if key.endswith("today") else "tomorrow"
         prog = "biscuit" if key.startswith("b") else "glaze"
         attrs = f'data-day="{day}" data-prog="{prog}"'
         if c is None:
-            return f'<td class="na" {attrs}>–</td>'
-        cls = f' class="{c["mark"]}"' if c["mark"] else ""
-        body = f'<strong>{dkk(c["value"])}</strong>' if c["mark"] else dkk(c["value"])
-        return f"<td{cls} {attrs}>{body}</td>"
+            return f'<td class="v dash" {attrs}>–</td>'
+        mark = f' {c["mark"]}' if c["mark"] else ""
+        return f'<td class="v{mark}" {attrs}>{c["value"]:.0f}</td>'
 
-    return (f'    <tr><th scope="row">{row["hour"]}</th>'
+    return (f'    <tr data-hour="{row["hour"]}"><th scope="row">{row["hour"]}</th>'
             + cell("b_today") + cell("g_today") + cell("b_tom") + cell("g_tom")
             + "</tr>")
 
@@ -155,15 +148,9 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
 
     rows = [row_html(r) for r in data["rows"]]
 
-    kpi = "".join([
-        kpi_html("I dag · Forglødning", data["best"]["b_today"], kiln_calc.C_BISC,
-                 not complete_today, "today", "b_today"),
-        kpi_html("I dag · Glasur", data["best"]["g_today"], kiln_calc.C_GLAZE,
-                 not complete_today, "today", "g_today"),
-        kpi_html("I morgen · Forglødning", data["best"]["b_tom"], kiln_calc.C_BISC,
-                 not complete_tomorrow, "tomorrow", "b_tom"),
-        kpi_html("I morgen · Glasur", data["best"]["g_tom"], kiln_calc.C_GLAZE,
-                 not complete_tomorrow, "tomorrow", "g_tom"),
+    hero = "".join([
+        hero_tile("b", "Forglødning", data["best"]["b_today"], kiln_calc.C_BISC, not complete_today),
+        hero_tile("g", "Glasur", data["best"]["g_today"], kiln_calc.C_GLAZE, not complete_today),
     ])
 
     # Everything the browser needs to decide whether a "today" optimum has already passed,
@@ -172,6 +159,13 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
         return [[int(r["hour"][:2]), r[key]["value"]]
                 for r in data["rows"] if r[key] is not None]
 
+    def _cheap(*keys: str) -> dict:
+        out = {}
+        for key in keys:
+            best = (data["best"] or {}).get(key)
+            out[key] = {"hour": best["hour"], "value": best["value"]} if best else None
+        return out
+
     kpi_json = {
         "date": today.isoformat(),
         "past": cfg.get("kpi_past", "hide"),
@@ -179,6 +173,9 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
         # plain swap of the two objects rather than a remapping of keys
         "today": {"b_today": _series("b_today"), "g_today": _series("g_today")},
         "tomorrow": {"b_today": _series("b_tom"), "g_today": _series("g_tom")},
+        # the tiles are re-rendered in the browser, so it needs both days' optima and the sizes
+        "cheapest": _cheap("b_today", "g_today", "b_tom", "g_tom"),
+        "kwh": {"b": round(sum(kiln_calc.C_BISC), 1), "g": round(sum(kiln_calc.C_GLAZE), 1)},
     }
 
     alert = ""
@@ -207,6 +204,11 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
                f"timepris × forbrug for hele brændingen — en brænding der starter om aftenen "
                f"prissættes med næste dags priser efter midnat.")
 
+    tom_pill = ('<span class="pill ok">offentliggjort</span>' if complete_tomorrow
+                else '<span class="pill">kl. 13:00</span>')
+    tom_note = ("Morgendagens 24 timer står i tabellen med –, og de fyldes ud, så snart "
+                "priserne offentliggøres ca. kl. 13:00.")
+
     area_links = cfg.get("areas", [area])
     html = open(os.path.join(HERE, "template.html")).read()
     for token, value in {
@@ -214,11 +216,16 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
         "{{SUBTITLE}}": cfg.get("subtitle", ""),
         "{{UPDATED}}": now_local.strftime("%d-%m-%Y kl. %H:%M"),
         "{{AREA}}": area,
+        "{{DSO_NAME}}": (dso + " Elnet") if dso else "spotpris uden nettarif",
         "{{AREA_TOGGLE}}": area_toggle(area_links, area),
         "{{ALERT}}": alert,
-        "{{TOMORROW_NOTE}}": note,
-        "{{KPI}}": kpi,
+        "{{KPI}}": hero,
         "{{ROWS}}": "\n".join(rows),
+        "{{TODAY_DATE}}": today.strftime("%d-%m-%Y"),
+        "{{TOMORROW_DATE}}": tomorrow.strftime("%d-%m-%Y"),
+        "{{TOM_PILL}}": tom_pill,
+        "{{TOM_NOTE}}": tom_note,
+        "{{TOM_NOTE_HIDDEN}}": "" if not complete_tomorrow else " hidden",
         "{{PROFILE_NOTE}}": profile,
         "{{BASIS_NOTE}}": basis,
         "{{BUILD_DATE}}": today.isoformat(),
