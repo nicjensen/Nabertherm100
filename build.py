@@ -214,7 +214,6 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
         "{{BASIS_NOTE}}": basis,
         "{{BUILD_DATE}}": today.isoformat(),
         "{{KPI_JSON}}": json.dumps(kpi_json, ensure_ascii=False).replace("</", "<\\/"),
-        "{{RAW_LINK}}": "prices.json" if area == cfg["area"] else f"prices-{area.lower()}.json",
     }.items():
         html = html.replace(token, value)
 

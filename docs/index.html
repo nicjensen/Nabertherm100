@@ -2,9 +2,21 @@
 <html lang="da">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Priser på Forglødning og Glasurbrænding</title>
 <meta name="description" content="Billigste starttidspunkt for Forglødning og Glasurbrænding i Nabertherm-ovnen, beregnet på danske spotpriser.">
+<!-- Installable app (PWA). Android/Chrome use the manifest and offer their own install
+     prompt; iOS needs the apple-* tags as well and offers no prompt at all, so iPhone
+     users get the hint at the bottom of the page instead. -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ovnpriser">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
 <style>
   :root{
     --bg:#0f1115; --card:#171a21; --card2:#1d2129; --line:#2a2f3a;
@@ -17,7 +29,9 @@
            --second:#9a7a12; --second-bg:rgba(154,122,18,.12); --accent:#c25a1a; }
   }
   *{box-sizing:border-box}
-  body{margin:0;padding:24px 16px 56px;background:var(--bg);color:var(--fg);
+  body{margin:0;padding:calc(24px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right))
+       calc(56px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+       background:var(--bg);color:var(--fg);
        font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
   .wrap{max-width:960px;margin:0 auto}
   h1{font-size:1.55rem;margin:0 0 4px;letter-spacing:-.01em}
@@ -60,23 +74,26 @@
   footer p{margin:6px 0}
   footer code{background:var(--card2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:.85em}
   a{color:var(--accent)}
+  .install-hint{display:none;background:var(--card);border:1px solid var(--line);
+                border-radius:10px;padding:10px 14px;margin:0 0 20px;font-size:.85rem;color:var(--muted)}
+  .install-hint b{color:var(--fg)}
 </style>
 </head>
-<body data-build-date="2026-10-06">
+<body data-build-date="2026-10-07">
 <div class="wrap">
   <h1><span class="f">🔥</span> Priser på Forglødning og Glasurbrænding</h1>
   <p class="sub">Nabertherm — hvornår er det billigst at starte ovnen? Priser inkl. nettarif, Energinet-tariffer, elafgift og moms.</p>
 
   <div class="meta">
-    <span class="badge">Opdateret 06-10-2026 kl. 19:22</span>
+    <span class="badge">Opdateret 07-10-2026 kl. 10:01</span>
     <span class="badge">Kilde: Energi Data Service (Nord Pool spot)</span>
   </div>
   
 
   
-  <p class="note">✅ Priser for i morgen er offentliggjort. Nye priser offentliggøres dagligt ca. kl. 13:00.</p>
+  <p class="note">Priser i morgen opdateres kl 13:00</p>
 
-  <div class="kpis"><div class="kpi" data-day="today" data-key="b_today" data-hour="2" data-label="I dag · Forglødning" data-kwh="29.7"><div class="k">I dag · Forglødning</div><div class="h">02:00</div><div class="v">62 kr. · 29.7 kWh</div></div><div class="kpi" data-day="today" data-key="g_today" data-hour="0" data-label="I dag · Glasur" data-kwh="29.0"><div class="k">I dag · Glasur</div><div class="h">00:00</div><div class="v">49 kr. · 29.0 kWh</div></div><div class="kpi" data-day="tomorrow" data-key="b_tom" data-hour="3" data-label="I morgen · Forglødning" data-kwh="29.7"><div class="k">I morgen · Forglødning</div><div class="h">03:00</div><div class="v">67 kr. · 29.7 kWh</div></div><div class="kpi" data-day="tomorrow" data-key="g_tom" data-hour="0" data-label="I morgen · Glasur" data-kwh="29.0"><div class="k">I morgen · Glasur</div><div class="h">00:00</div><div class="v">58 kr. · 29.0 kWh</div></div></div>
+  <div class="kpis"><div class="kpi" data-day="today" data-key="b_today" data-hour="3" data-label="I dag · Forglødning" data-kwh="29.7"><div class="k">I dag · Forglødning</div><div class="h">03:00</div><div class="v">67 kr. · 29.7 kWh</div></div><div class="kpi" data-day="today" data-key="g_today" data-hour="0" data-label="I dag · Glasur" data-kwh="29.0"><div class="k">I dag · Glasur</div><div class="h">00:00</div><div class="v">58 kr. · 29.0 kWh</div></div><div class="kpi pending" data-day="tomorrow" data-key="b_tom"><div class="k">I morgen · Forglødning</div><div class="h">Priser ikke offentliggjort endnu</div><div class="v">offentliggøres kl. 13:00</div></div><div class="kpi pending" data-day="tomorrow" data-key="g_tom"><div class="k">I morgen · Glasur</div><div class="h">Priser ikke offentliggjort endnu</div><div class="v">offentliggøres kl. 13:00</div></div></div>
 
   <div class="scroll">
   <table>
@@ -91,30 +108,30 @@
       </tr>
     </thead>
     <tbody>
-    <tr><th scope="row">00:00</th><td class="second"><strong>63 kr.</strong></td><td class="best"><strong>49 kr.</strong></td><td>71 kr.</td><td class="best"><strong>58 kr.</strong></td></tr>
-    <tr><th scope="row">01:00</th><td class="second"><strong>63 kr.</strong></td><td class="second"><strong>54 kr.</strong></td><td>69 kr.</td><td>63 kr.</td></tr>
-    <tr><th scope="row">02:00</th><td class="best"><strong>62 kr.</strong></td><td>62 kr.</td><td class="second"><strong>68 kr.</strong></td><td>71 kr.</td></tr>
-    <tr><th scope="row">03:00</th><td class="best"><strong>62 kr.</strong></td><td>70 kr.</td><td class="best"><strong>67 kr.</strong></td><td>78 kr.</td></tr>
-    <tr><th scope="row">04:00</th><td class="best"><strong>62 kr.</strong></td><td>73 kr.</td><td class="best"><strong>67 kr.</strong></td><td>80 kr.</td></tr>
-    <tr><th scope="row">05:00</th><td>65 kr.</td><td>72 kr.</td><td>69 kr.</td><td>77 kr.</td></tr>
-    <tr><th scope="row">06:00</th><td>72 kr.</td><td>68 kr.</td><td>73 kr.</td><td>73 kr.</td></tr>
-    <tr><th scope="row">07:00</th><td>80 kr.</td><td>63 kr.</td><td>77 kr.</td><td>67 kr.</td></tr>
-    <tr><th scope="row">08:00</th><td>87 kr.</td><td>59 kr.</td><td>80 kr.</td><td>62 kr.</td></tr>
-    <tr><th scope="row">09:00</th><td>90 kr.</td><td>55 kr.</td><td>81 kr.</td><td class="second"><strong>59 kr.</strong></td></tr>
-    <tr><th scope="row">10:00</th><td>91 kr.</td><td>55 kr.</td><td>79 kr.</td><td class="best"><strong>58 kr.</strong></td></tr>
-    <tr><th scope="row">11:00</th><td>91 kr.</td><td>57 kr.</td><td>78 kr.</td><td>60 kr.</td></tr>
-    <tr><th scope="row">12:00</th><td>90 kr.</td><td>69 kr.</td><td class="na">–</td><td>69 kr.</td></tr>
-    <tr><th scope="row">13:00</th><td>88 kr.</td><td>87 kr.</td><td class="na">–</td><td>81 kr.</td></tr>
-    <tr><th scope="row">14:00</th><td>86 kr.</td><td>107 kr.</td><td class="na">–</td><td>92 kr.</td></tr>
-    <tr><th scope="row">15:00</th><td>83 kr.</td><td>117 kr.</td><td class="na">–</td><td>95 kr.</td></tr>
-    <tr><th scope="row">16:00</th><td>81 kr.</td><td>113 kr.</td><td class="na">–</td><td>90 kr.</td></tr>
-    <tr><th scope="row">17:00</th><td>79 kr.</td><td>104 kr.</td><td class="na">–</td><td>83 kr.</td></tr>
-    <tr><th scope="row">18:00</th><td>76 kr.</td><td>93 kr.</td><td class="na">–</td><td>72 kr.</td></tr>
-    <tr><th scope="row">19:00</th><td>74 kr.</td><td>82 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">20:00</th><td>73 kr.</td><td>72 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">21:00</th><td>73 kr.</td><td>64 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">22:00</th><td>73 kr.</td><td>61 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">23:00</th><td>72 kr.</td><td>59 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">00:00</th><td>71 kr.</td><td class="best"><strong>58 kr.</strong></td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">01:00</th><td>69 kr.</td><td>63 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">02:00</th><td class="second"><strong>68 kr.</strong></td><td>71 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">03:00</th><td class="best"><strong>67 kr.</strong></td><td>78 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">04:00</th><td class="best"><strong>67 kr.</strong></td><td>80 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">05:00</th><td>69 kr.</td><td>77 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">06:00</th><td>73 kr.</td><td>73 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">07:00</th><td>77 kr.</td><td>67 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">08:00</th><td>80 kr.</td><td>62 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">09:00</th><td>81 kr.</td><td class="second"><strong>59 kr.</strong></td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">10:00</th><td>79 kr.</td><td class="best"><strong>58 kr.</strong></td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">11:00</th><td>78 kr.</td><td>60 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">12:00</th><td class="na">–</td><td>69 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">13:00</th><td class="na">–</td><td>81 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">14:00</th><td class="na">–</td><td>92 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">15:00</th><td class="na">–</td><td>95 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">16:00</th><td class="na">–</td><td>90 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">17:00</th><td class="na">–</td><td>83 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">18:00</th><td class="na">–</td><td>72 kr.</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">19:00</th><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">20:00</th><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">21:00</th><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">22:00</th><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">23:00</th><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
     </tbody>
   </table>
   </div>
@@ -128,12 +145,10 @@
   <footer>
     <p>Programmer: Forglødning 13 timer / 29.7 kWh · Glasur 6 timer / 29.0 kWh. Beløbet pr. række er summen af timepris × forbrug for hele brændingen — en brænding der starter om aftenen prissættes med næste dags priser efter midnat.</p>
     <p>Nettarif Radius Elnet — København, Nordsjælland, dele af Midtsjælland: Lavlast kl. 00-06 13.27 øre · Højlast kl. 06-17 39.82 øre · Spidslast kl. 17-21 119.45 øre · Højlast kl. 21-24 39.82 øre (officiel sats fra Energi Data Service DataHub, kode DT_C_01, gældende 2026-10-01 til 2027-04-01). Energinet (system+transmission) 14.40 øre/kWh og elafgift 1.00 øre/kWh er ens hele døgnet. Alt er inkl. moms (spotprisen ganges med 1,25). Faste abonnementer (netabonnement, systemabonnement og elselskabets månedsgebyr) er ikke medregnet, fordi de ikke afhænger af, hvornår ovnen startes.</p>
-    <p>Rådata: <a href="prices.json">JSON med timepriser og beregnede beløb</a> · bygges automatisk hver time af GitHub Actions.</p>
-    <p>Kildekode og beregning: <code>kiln_calc.py</code> (identisk med Home Assistant-kortet, verificeret af <code>parity_test.py</code>).</p>
   </footer>
 </div>
 
-<script id="kiln-kpi-data" type="application/json">{"date": "2026-10-06", "past": "hide", "today": {"b_today": [[0, 63], [1, 63], [2, 62], [3, 62], [4, 62], [5, 65], [6, 72], [7, 80], [8, 87], [9, 90], [10, 91], [11, 91], [12, 90], [13, 88], [14, 86], [15, 83], [16, 81], [17, 79], [18, 76], [19, 74], [20, 73], [21, 73], [22, 73], [23, 72]], "g_today": [[0, 49], [1, 54], [2, 62], [3, 70], [4, 73], [5, 72], [6, 68], [7, 63], [8, 59], [9, 55], [10, 55], [11, 57], [12, 69], [13, 87], [14, 107], [15, 117], [16, 113], [17, 104], [18, 93], [19, 82], [20, 72], [21, 64], [22, 61], [23, 59]]}}</script>
+<script id="kiln-kpi-data" type="application/json">{"date": "2026-10-07", "past": "hide", "today": {"b_today": [[0, 71], [1, 69], [2, 68], [3, 67], [4, 67], [5, 69], [6, 73], [7, 77], [8, 80], [9, 81], [10, 79], [11, 78]], "g_today": [[0, 58], [1, 63], [2, 71], [3, 78], [4, 80], [5, 77], [6, 73], [7, 67], [8, 62], [9, 59], [10, 58], [11, 60], [12, 69], [13, 81], [14, 92], [15, 95], [16, 90], [17, 83], [18, 72]]}}</script>
 <script>
 /* A "cheapest today" card is only useful while its start hour is still ahead. The page is a
    snapshot (rebuilt hourly), so the check runs here, in the viewer's browser, against
@@ -204,6 +219,37 @@
   window.kilnApplyKpi = apply;    // exposed so the check can be driven at any hour in tests
   apply();
   setInterval(apply, 60000);      // a page left open crosses hours: re-check every minute
+})();
+</script>
+
+<div class="wrap">
+  <p class="install-hint" id="install-hint">
+    <b>Få den på hjemmeskærmen:</b> tryk <b>Del</b> (firkanten med pilen op) → <b>Føj til
+    hjemmeskærm</b>. Så åbner den som en app, og de sidste kendte priser virker også uden
+    netforbindelse.
+  </p>
+</div>
+<script>
+/* Installable app: the service worker is what makes it work offline. It needs a secure
+   context, so this is a no-op when the page is opened straight from disk. iOS gives no
+   install prompt of its own, so iPhone users get told how. */
+(function () {
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var standalone = navigator.standalone === true ||
+                   (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+  if (isIOS && !standalone) {
+    document.getElementById("install-hint").style.display = "block";
+  }
+  if ("serviceWorker" in navigator &&
+      (location.protocol === "https:" || location.hostname === "localhost" ||
+       location.hostname === "127.0.0.1")) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function (err) {
+        console.warn("service worker not registered:", err);
+      });
+    });
+  }
 })();
 </script>
 </body>

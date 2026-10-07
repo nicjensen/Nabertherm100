@@ -1,0 +1,18 @@
+{
+  "name": "Priser på Forglødning og Glasurbrænding",
+  "short_name": "Ovnpriser",
+  "description": "Billigste starttidspunkt for Forglødning og Glasurbrænding i Nabertherm-ovnen: danske spotpriser med nettarif, Energinet-tariffer, elafgift og moms.",
+  "lang": "da",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#0f1115",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
