@@ -85,13 +85,14 @@
   <p class="sub">Nabertherm TOP100 — hvornår er det billigst at starte ovnen? Priser inkl. nettarif, Energinet-tariffer, elafgift og moms.</p>
 
   <div class="meta">
-    <span class="badge">Opdateret 07-10-2026 kl. 10:02</span>
+    <span class="badge">Opdateret 07-10-2026 kl. 10:11</span>
     <span class="badge">Kilde: Energi Data Service (Nord Pool spot)</span>
   </div>
   
 
   
   <p class="note">Priser i morgen opdateres kl 13:00</p>
+  <p class="note" id="roll-note" hidden></p>
 
   <div class="kpis"><div class="kpi" data-day="today" data-key="b_today" data-hour="3" data-label="I dag · Forglødning" data-kwh="29.7"><div class="k">I dag · Forglødning</div><div class="h">03:00</div><div class="v">67 kr. · 29.7 kWh</div></div><div class="kpi" data-day="today" data-key="g_today" data-hour="0" data-label="I dag · Glasur" data-kwh="29.0"><div class="k">I dag · Glasur</div><div class="h">00:00</div><div class="v">58 kr. · 29.0 kWh</div></div><div class="kpi pending" data-day="tomorrow" data-key="b_tom"><div class="k">I morgen · Forglødning</div><div class="h">Priser ikke offentliggjort endnu</div><div class="v">offentliggøres kl. 13:00</div></div><div class="kpi pending" data-day="tomorrow" data-key="g_tom"><div class="k">I morgen · Glasur</div><div class="h">Priser ikke offentliggjort endnu</div><div class="v">offentliggøres kl. 13:00</div></div></div>
 
@@ -101,37 +102,37 @@
     <thead>
       <tr>
         <th scope="col">🕒 Start</th>
-        <th scope="col">I dag<br>Forglødning</th>
-        <th scope="col">I dag<br>Glasur</th>
-        <th scope="col">I morgen<br>Forglødning</th>
-        <th scope="col">I morgen<br>Glasur</th>
+        <th scope="col" data-day="today" data-prog="biscuit">I dag<br>Forglødning</th>
+        <th scope="col" data-day="today" data-prog="glaze">I dag<br>Glasur</th>
+        <th scope="col" data-day="tomorrow" data-prog="biscuit">I morgen<br>Forglødning</th>
+        <th scope="col" data-day="tomorrow" data-prog="glaze">I morgen<br>Glasur</th>
       </tr>
     </thead>
     <tbody>
-    <tr><th scope="row">00:00</th><td>71 kr.</td><td class="best"><strong>58 kr.</strong></td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">01:00</th><td>69 kr.</td><td>63 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">02:00</th><td class="second"><strong>68 kr.</strong></td><td>71 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">03:00</th><td class="best"><strong>67 kr.</strong></td><td>78 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">04:00</th><td class="best"><strong>67 kr.</strong></td><td>80 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">05:00</th><td>69 kr.</td><td>77 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">06:00</th><td>73 kr.</td><td>73 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">07:00</th><td>77 kr.</td><td>67 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">08:00</th><td>80 kr.</td><td>62 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">09:00</th><td>81 kr.</td><td class="second"><strong>59 kr.</strong></td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">10:00</th><td>79 kr.</td><td class="best"><strong>58 kr.</strong></td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">11:00</th><td>78 kr.</td><td>60 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">12:00</th><td class="na">–</td><td>69 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">13:00</th><td class="na">–</td><td>81 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">14:00</th><td class="na">–</td><td>92 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">15:00</th><td class="na">–</td><td>95 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">16:00</th><td class="na">–</td><td>90 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">17:00</th><td class="na">–</td><td>83 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">18:00</th><td class="na">–</td><td>72 kr.</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">19:00</th><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">20:00</th><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">21:00</th><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">22:00</th><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
-    <tr><th scope="row">23:00</th><td class="na">–</td><td class="na">–</td><td class="na">–</td><td class="na">–</td></tr>
+    <tr><th scope="row">00:00</th><td data-day="today" data-prog="biscuit">71 kr.</td><td class="best" data-day="today" data-prog="glaze"><strong>58 kr.</strong></td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">01:00</th><td data-day="today" data-prog="biscuit">69 kr.</td><td data-day="today" data-prog="glaze">63 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">02:00</th><td class="second" data-day="today" data-prog="biscuit"><strong>68 kr.</strong></td><td data-day="today" data-prog="glaze">71 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">03:00</th><td class="best" data-day="today" data-prog="biscuit"><strong>67 kr.</strong></td><td data-day="today" data-prog="glaze">78 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">04:00</th><td class="best" data-day="today" data-prog="biscuit"><strong>67 kr.</strong></td><td data-day="today" data-prog="glaze">80 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">05:00</th><td data-day="today" data-prog="biscuit">69 kr.</td><td data-day="today" data-prog="glaze">77 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">06:00</th><td data-day="today" data-prog="biscuit">73 kr.</td><td data-day="today" data-prog="glaze">73 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">07:00</th><td data-day="today" data-prog="biscuit">77 kr.</td><td data-day="today" data-prog="glaze">67 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">08:00</th><td data-day="today" data-prog="biscuit">80 kr.</td><td data-day="today" data-prog="glaze">62 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">09:00</th><td data-day="today" data-prog="biscuit">81 kr.</td><td class="second" data-day="today" data-prog="glaze"><strong>59 kr.</strong></td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">10:00</th><td data-day="today" data-prog="biscuit">79 kr.</td><td class="best" data-day="today" data-prog="glaze"><strong>58 kr.</strong></td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">11:00</th><td data-day="today" data-prog="biscuit">78 kr.</td><td data-day="today" data-prog="glaze">60 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">12:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">69 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">13:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">81 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">14:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">92 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">15:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">95 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">16:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">90 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">17:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">83 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">18:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td data-day="today" data-prog="glaze">72 kr.</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">19:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td class="na" data-day="today" data-prog="glaze">–</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">20:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td class="na" data-day="today" data-prog="glaze">–</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">21:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td class="na" data-day="today" data-prog="glaze">–</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">22:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td class="na" data-day="today" data-prog="glaze">–</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr><th scope="row">23:00</th><td class="na" data-day="today" data-prog="biscuit">–</td><td class="na" data-day="today" data-prog="glaze">–</td><td class="na" data-day="tomorrow" data-prog="biscuit">–</td><td class="na" data-day="tomorrow" data-prog="glaze">–</td></tr>
     </tbody>
   </table>
   </div>
@@ -148,12 +149,169 @@
   </footer>
 </div>
 
-<script id="kiln-kpi-data" type="application/json">{"date": "2026-10-07", "past": "hide", "today": {"b_today": [[0, 71], [1, 69], [2, 68], [3, 67], [4, 67], [5, 69], [6, 73], [7, 77], [8, 80], [9, 81], [10, 79], [11, 78]], "g_today": [[0, 58], [1, 63], [2, 71], [3, 78], [4, 80], [5, 77], [6, 73], [7, 67], [8, 62], [9, 59], [10, 58], [11, 60], [12, 69], [13, 81], [14, 92], [15, 95], [16, 90], [17, 83], [18, 72]]}}</script>
+<script id="kiln-kpi-data" type="application/json">{"date": "2026-10-07", "past": "hide", "today": {"b_today": [[0, 71], [1, 69], [2, 68], [3, 67], [4, 67], [5, 69], [6, 73], [7, 77], [8, 80], [9, 81], [10, 79], [11, 78]], "g_today": [[0, 58], [1, 63], [2, 71], [3, 78], [4, 80], [5, 77], [6, 73], [7, 67], [8, 62], [9, 59], [10, 58], [11, 60], [12, 69], [13, 81], [14, 92], [15, 95], [16, 90], [17, 83], [18, 72]]}, "tomorrow": {"b_today": [], "g_today": []}}</script>
+<script>
+/* Day rollover, done by the browser.
+ *
+ * The page is a snapshot, rebuilt once a day shortly after the afternoon publication of
+ * tomorrow's prices. So nothing needs to be rebuilt at midnight: the columns can simply
+ * change places. The numbers in the "i morgen" columns were computed by exactly the same
+ * server-side code as the "i dag" ones, so this recalculates nothing — it moves the two
+ * column pairs, relabels them, and lets "i morgen" wait for the next publication. Doing it
+ * here also means the rollover cannot be missed by a skipped GitHub run.
+ */
+(function () {
+  var source = document.getElementById("kiln-kpi-data");
+  if (!source) return;
+  var data = JSON.parse(source.textContent);
+  var shownDate = data.date;         // the day the "i dag" columns stand for
+  var rolled = false;
+
+  var DAY = { today: "I dag", tomorrow: "I morgen" };
+  var PROG = { biscuit: "Forglødning", glaze: "Glasur" };
+
+  function nowInCopenhagen() {
+    var parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Copenhagen", year: "numeric", month: "2-digit",
+      day: "2-digit", hour: "2-digit", hour12: false
+    }).formatToParts(new Date());
+    var pick = function (type) {
+      for (var i = 0; i < parts.length; i++) { if (parts[i].type === type) return parts[i].value; }
+      return "";
+    };
+    return { date: pick("year") + "-" + pick("month") + "-" + pick("day"),
+             hour: parseInt(pick("hour"), 10) % 24 };
+  }
+
+  function shiftDate(iso, days) {
+    var p = iso.split("-");
+    var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+    d.setUTCDate(d.getUTCDate() + days);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function dkDate(iso) {
+    var p = iso.split("-");
+    return p[2] + "-" + p[1] + "-" + p[0];
+  }
+
+  function noteEl() { return document.getElementById("roll-note"); }
+
+  function say(text, force) {
+    var el = noteEl();
+    if (!el) return;
+    if (!force && el.textContent) return;      // the more specific message wins
+    el.textContent = text;
+    el.hidden = !text;
+  }
+
+  function tomorrowHasNumbers() {
+    var cells = document.querySelectorAll('tbody td[data-day="tomorrow"]');
+    for (var i = 0; i < cells.length; i++) {
+      if (cells[i].className !== "na") return true;
+    }
+    return false;
+  }
+
+  function relabel(el) {
+    el.innerHTML = DAY[el.getAttribute("data-day")] + "<br>" + PROG[el.getAttribute("data-prog")];
+  }
+
+  function swapColumns() {
+    var rows = document.querySelectorAll("thead tr, tbody tr");
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (row.children.length !== 5) continue;
+      var old = [row.children[1], row.children[2]];      // currently "i dag"
+      var next = [row.children[3], row.children[4]];     // currently "i morgen"
+      row.insertBefore(next[0], old[0]);
+      row.insertBefore(next[1], old[0]);
+      var head = row.parentNode.tagName === "THEAD";
+      [next[0], next[1]].forEach(function (el) {          // the new day
+        el.setAttribute("data-day", "today");
+        if (head) relabel(el);
+      });
+      [old[0], old[1]].forEach(function (el) {            // emptied until the next publication
+        el.setAttribute("data-day", "tomorrow");
+        if (head) { relabel(el); }
+        else { el.className = "na"; el.textContent = "–"; }
+      });
+    }
+  }
+
+  function promoteCards() {
+    var cards = document.querySelectorAll(".kpis .kpi");
+    for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      var key = card.getAttribute("data-key") || "";
+      var prog = key.indexOf("g_") === 0 ? "glaze" : "biscuit";
+      if (card.getAttribute("data-day") === "tomorrow") {
+        card.setAttribute("data-day", "today");           // its numbers already are today's
+        card.setAttribute("data-key", prog === "glaze" ? "g_today" : "b_today");
+        card.setAttribute("data-label", "I dag · " + PROG[prog]);
+        card.querySelector(".k").textContent = "I dag · " + PROG[prog];
+      } else {
+        card.className = "kpi pending";
+        card.setAttribute("data-day", "tomorrow");
+        card.setAttribute("data-key", prog === "glaze" ? "g_tom" : "b_tom");
+        card.removeAttribute("data-hour");
+        card.removeAttribute("data-kwh");
+        card.querySelector(".k").textContent = "I morgen · " + PROG[prog];
+        card.querySelector(".h").textContent = "Priser ikke offentliggjort endnu";
+        card.querySelector(".v").textContent = "offentliggøres kl. 13:00";
+      }
+    }
+  }
+
+  function maybeRoll(now) {
+    if (rolled) return false;                            // only ever one day
+    if (now.date !== shiftDate(data.date, 1)) return false;
+    if (!tomorrowHasNumbers()) {
+      say("Siden er bygget " + dkDate(data.date) + ", før morgendagens priser blev " +
+          "offentliggjort. Tallene nedenfor er derfor for " + dkDate(data.date) + ".", true);
+      return false;
+    }
+    swapColumns();
+    promoteCards();
+    window.kilnSeries = data.tomorrow || null;            // the series follow the columns
+    shownDate = shiftDate(data.date, 1);
+    rolled = true;
+    say("Morgendagens priser er ikke offentliggjort endnu (de kommer ca. kl. 13:00). " +
+        "Tallene for i dag er dagens priser.", true);
+    return true;
+  }
+
+  function maybeStale(now) {
+    if (now.date <= shownDate) return false;             // still the day we are showing
+    var cards = document.querySelectorAll(".kpis .kpi");
+    for (var i = 0; i < cards.length; i++) cards[i].classList.add("elapsed");
+    say("Siden er ikke blevet opdateret siden " + dkDate(shownDate) +
+        ", så dagens og morgendagens tal kendes ikke.", false);
+    return true;
+  }
+
+  window.kilnToday = nowInCopenhagen;
+  window.kilnRollover = maybeRoll;      // tests drive the rollover with a synthetic clock
+
+  var boot = nowInCopenhagen();
+  maybeRoll(boot);
+  maybeStale(boot);
+  window.kilnShownDate = shownDate;
+
+  setInterval(function () {
+    var now = nowInCopenhagen();
+    maybeRoll(now);                                      // a page left open crosses midnight
+    maybeStale(now);
+    window.kilnShownDate = shownDate;
+    if (window.kilnApplyKpi) window.kilnApplyKpi(now);
+  }, 60000);
+})();
+</script>
 <script>
 /* A "cheapest today" card is only useful while its start hour is still ahead. The page is a
-   snapshot (rebuilt hourly), so the check runs here, in the viewer's browser, against
-   Copenhagen time — not at build time. A start hour counts as still available through the
-   end of that clock hour. */
+   snapshot (rebuilt once a day, after the afternoon publication), so the check runs here, in
+   the viewer's browser, against Copenhagen time — not at build time. A start hour counts as
+   still available through the end of that clock hour. */
 (function () {
   var data = JSON.parse(document.getElementById("kiln-kpi-data").textContent);
   var MODE = data.past || "hide";          // "hide" | "remaining" (config: kpi_past)
@@ -196,13 +354,14 @@
 
   function apply(now) {
     now = now || nowInCopenhagen();
-    var stale = now.date !== data.date;        // page built for another day
+    var stale = now.date !== (window.kilnShownDate || data.date);   // no longer the shown day
     cards.forEach(function (card) {
       restore(card);                            // idempotent: never stack a decision
       var built = card.getAttribute("data-hour");
       if (built === null) return;               // pending / no data
       if (!stale && now.hour <= parseInt(built, 10)) return;
-      var series = (data.today || {})[card.getAttribute("data-key")];
+      var kpiKey = card.getAttribute("data-key");
+      var series = (window.kilnSeries && window.kilnSeries[kpiKey]) || (data.today || {})[kpiKey];
       var alt = (!stale && MODE === "remaining" && series)
         ? cheapestRemaining(series, now.hour) : null;
       if (alt) {

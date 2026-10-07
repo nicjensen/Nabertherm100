@@ -20,13 +20,28 @@ tomorrow's prices after midnight, because the card (and this site) concatenates 
 tomorrow before computing the windows.
 
 **A passed optimum is not advertised.** The four "cheapest" cards at the top are checked in
-*your browser*, not at build time — the page is a snapshot rebuilt hourly, so a card can be
+*your browser*, not at build time — the page is a snapshot rebuilt once a day, so a card can be
 hours stale by the time it is opened. Once a card's start hour is behind the current
 Copenhagen time it is dropped (`kpi_past: "hide"`), or re-pointed to the cheapest start still
 available today (`kpi_past: "remaining"`). A start hour counts as available through the end of
 that clock hour, the check re-runs every minute so a page left open stays honest, and if the
 page is a day old the cards are hidden outright. **The table below always shows the whole day,
 passed hours included** — that is the record; the cards are only the recommendation.
+
+## When it updates
+
+Tomorrow's prices are published around 13:00 local time and nothing else in the data changes
+during the day, so the workflow runs **once a day, at 13:15 local** (two cron entries, so DST
+cannot shift it) plus on every push — the first push builds the page with both days. Then **the
+browser moves the day at midnight**, so nothing has to be rebuilt for it: the "i morgen" columns
+slide into "i dag" (their numbers were computed by exactly the same server-side code, so the
+rollover relabels and reorders, it never recalculates), the cards swap places, and "i morgen"
+goes back to dashes until the next afternoon publication. Because the rollover lives in the
+page, a skipped GitHub run cannot leave the site calling yesterday "i dag".
+
+Two states are called out rather than guessed at: if the page was built before the afternoon
+publication (so it has nothing to promote), or if it is more than a day old, it says so in a
+note and hides the cards. The page always prints its own build time, so staleness stays visible.
 
 ## The price build-up
 
@@ -132,8 +147,8 @@ and Radius are in `tariffs.py` so far; add yours from the company's own price li
 3. **Turn Pages on** once: *Settings → Pages → Source: Deploy from a branch →
    Branch: `main`, folder: `/docs` → Save*.
    (Or set it in one API call — see below.)
-4. The workflow then runs hourly, rebuilds `docs/`, and commits if the numbers changed.
-   The site lands at `https://nicjensen.github.io/kiln-prices/`.
+4. The workflow then runs once a day (13:15 local) and on every push, rebuilds `docs/`, and
+   commits when anything changed. The site lands at `https://nicjensen.github.io/kiln-prices/`.
 
 One-time Pages setup via API, if you would rather not click:
 

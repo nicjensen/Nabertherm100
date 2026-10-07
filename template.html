@@ -92,6 +92,7 @@
 
   {{ALERT}}
   <p class="note">{{TOMORROW_NOTE}}</p>
+  <p class="note" id="roll-note" hidden></p>
 
   <div class="kpis">{{KPI}}</div>
 
@@ -101,10 +102,10 @@
     <thead>
       <tr>
         <th scope="col">🕒 Start</th>
-        <th scope="col">I dag<br>Forglødning</th>
-        <th scope="col">I dag<br>Glasur</th>
-        <th scope="col">I morgen<br>Forglødning</th>
-        <th scope="col">I morgen<br>Glasur</th>
+        <th scope="col" data-day="today" data-prog="biscuit">I dag<br>Forglødning</th>
+        <th scope="col" data-day="today" data-prog="glaze">I dag<br>Glasur</th>
+        <th scope="col" data-day="tomorrow" data-prog="biscuit">I morgen<br>Forglødning</th>
+        <th scope="col" data-day="tomorrow" data-prog="glaze">I morgen<br>Glasur</th>
       </tr>
     </thead>
     <tbody>
@@ -127,10 +128,177 @@
 
 <script id="kiln-kpi-data" type="application/json">{{KPI_JSON}}</script>
 <script>
+/* Day rollover, done by the browser.
+ *
+ * The page is a snapshot, rebuilt once a day shortly after the afternoon publication of
+ * tomorrow's prices. So nothing needs to be rebuilt at midnight: the columns can simply
+ * change places. The numbers in the "i morgen" columns were computed by exactly the same
+ * server-side code as the "i dag" ones, so this recalculates nothing — it moves the two
+ * column pairs, relabels them, and lets "i morgen" wait for the next publication. Doing it
+ * here also means the rollover cannot be missed by a skipped GitHub run.
+ */
+(function () {
+  var source = document.getElementById("kiln-kpi-data");
+  if (!source) return;
+  var data = JSON.parse(source.textContent);
+  var shownDate = data.date;         // the day the "i dag" columns stand for
+  var rolled = false;
+
+  var DAY = { today: "I dag", tomorrow: "I morgen" };
+  var PROG = { biscuit: "Forglødning", glaze: "Glasur" };
+
+  function nowInCopenhagen() {
+    var parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Copenhagen", year: "numeric", month: "2-digit",
+      day: "2-digit", hour: "2-digit", hour12: false
+    }).formatToParts(new Date());
+    var pick = function (type) {
+      for (var i = 0; i < parts.length; i++) { if (parts[i].type === type) return parts[i].value; }
+      return "";
+    };
+    return { date: pick("year") + "-" + pick("month") + "-" + pick("day"),
+             hour: parseInt(pick("hour"), 10) % 24 };
+  }
+
+  function shiftDate(iso, days) {
+    var p = iso.split("-");
+    var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+    d.setUTCDate(d.getUTCDate() + days);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function dkDate(iso) {
+    var p = iso.split("-");
+    return p[2] + "-" + p[1] + "-" + p[0];
+  }
+
+  function noteEl() { return document.getElementById("roll-note"); }
+
+  function say(text, force) {
+    var el = noteEl();
+    if (!el) return;
+    if (!force && el.textContent) return;      // the more specific message wins
+    el.textContent = text;
+    el.hidden = !text;
+  }
+
+  function tomorrowHasNumbers() {
+    var cells = document.querySelectorAll('tbody td[data-day="tomorrow"]');
+    for (var i = 0; i < cells.length; i++) {
+      if (cells[i].className !== "na") return true;
+    }
+    return false;
+  }
+
+  function relabel(el) {
+    el.innerHTML = DAY[el.getAttribute("data-day")] + "<br>" + PROG[el.getAttribute("data-prog")];
+  }
+
+  function swapColumns() {
+    var rows = document.querySelectorAll("thead tr, tbody tr");
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (row.children.length !== 5) continue;
+      var old = [row.children[1], row.children[2]];      // currently "i dag"
+      var next = [row.children[3], row.children[4]];     // currently "i morgen"
+      row.insertBefore(next[0], old[0]);
+      row.insertBefore(next[1], old[0]);
+      var head = row.parentNode.tagName === "THEAD";
+      [next[0], next[1]].forEach(function (el) {          // the new day
+        el.setAttribute("data-day", "today");
+        if (head) relabel(el);
+      });
+      [old[0], old[1]].forEach(function (el) {            // emptied until the next publication
+        el.setAttribute("data-day", "tomorrow");
+        if (head) { relabel(el); }
+        else { el.className = "na"; el.textContent = "–"; }
+      });
+    }
+  }
+
+  function promoteCards() {
+    var cards = document.querySelectorAll(".kpis .kpi");
+    for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      var key = card.getAttribute("data-key") || "";
+      var prog = key.indexOf("g_") === 0 ? "glaze" : "biscuit";
+      if (card.getAttribute("data-day") === "tomorrow") {
+        card.setAttribute("data-day", "today");           // its numbers already are today's
+        card.setAttribute("data-key", prog === "glaze" ? "g_today" : "b_today");
+        card.setAttribute("data-label", "I dag · " + PROG[prog]);
+        card.querySelector(".k").textContent = "I dag · " + PROG[prog];
+      } else {
+        card.className = "kpi pending";
+        card.setAttribute("data-day", "tomorrow");
+        card.setAttribute("data-key", prog === "glaze" ? "g_tom" : "b_tom");
+        card.removeAttribute("data-hour");
+        card.removeAttribute("data-kwh");
+        card.querySelector(".k").textContent = "I morgen · " + PROG[prog];
+        card.querySelector(".h").textContent = "Priser ikke offentliggjort endnu";
+        card.querySelector(".v").textContent = "offentliggøres kl. 13:00";
+      }
+    }
+  }
+
+  function reorderCards() {
+    var box = document.querySelector(".kpis");
+    if (!box) return;
+    ["b_today", "g_today", "b_tom", "g_tom"].forEach(function (key) {
+      var card = box.querySelector('.kpi[data-key="' + key + '"]');
+      if (card) box.appendChild(card);      // appendChild moves the node, so this re-sorts them
+    });
+  }
+
+  function maybeRoll(now) {
+    if (rolled) return false;                            // only ever one day
+    if (now.date !== shiftDate(data.date, 1)) return false;
+    if (!tomorrowHasNumbers()) {
+      say("Siden er bygget " + dkDate(data.date) + ", før morgendagens priser blev " +
+          "offentliggjort. Tallene nedenfor er derfor for " + dkDate(data.date) + ".", true);
+      return false;
+    }
+    swapColumns();
+    promoteCards();
+    reorderCards();                                      // i dag first, i morgen after it
+    window.kilnSeries = data.tomorrow || null;            // the series follow the columns
+    shownDate = shiftDate(data.date, 1);
+    rolled = true;
+    say("Morgendagens priser er ikke offentliggjort endnu (de kommer ca. kl. 13:00). " +
+        "Tallene for i dag er dagens priser.", true);
+    return true;
+  }
+
+  function maybeStale(now) {
+    if (now.date <= shownDate) return false;             // still the day we are showing
+    var cards = document.querySelectorAll(".kpis .kpi");
+    for (var i = 0; i < cards.length; i++) cards[i].classList.add("elapsed");
+    say("Siden er ikke blevet opdateret siden " + dkDate(shownDate) +
+        ", så dagens og morgendagens tal kendes ikke.", false);
+    return true;
+  }
+
+  window.kilnToday = nowInCopenhagen;
+  window.kilnRollover = maybeRoll;      // tests drive the rollover with a synthetic clock
+
+  var boot = nowInCopenhagen();
+  maybeRoll(boot);
+  maybeStale(boot);
+  window.kilnShownDate = shownDate;
+
+  setInterval(function () {
+    var now = nowInCopenhagen();
+    maybeRoll(now);                                      // a page left open crosses midnight
+    maybeStale(now);
+    window.kilnShownDate = shownDate;
+    if (window.kilnApplyKpi) window.kilnApplyKpi(now);
+  }, 60000);
+})();
+</script>
+<script>
 /* A "cheapest today" card is only useful while its start hour is still ahead. The page is a
-   snapshot (rebuilt hourly), so the check runs here, in the viewer's browser, against
-   Copenhagen time — not at build time. A start hour counts as still available through the
-   end of that clock hour. */
+   snapshot (rebuilt once a day, after the afternoon publication), so the check runs here, in
+   the viewer's browser, against Copenhagen time — not at build time. A start hour counts as
+   still available through the end of that clock hour. */
 (function () {
   var data = JSON.parse(document.getElementById("kiln-kpi-data").textContent);
   var MODE = data.past || "hide";          // "hide" | "remaining" (config: kpi_past)
@@ -173,13 +341,14 @@
 
   function apply(now) {
     now = now || nowInCopenhagen();
-    var stale = now.date !== data.date;        // page built for another day
+    var stale = now.date !== (window.kilnShownDate || data.date);   // no longer the shown day
     cards.forEach(function (card) {
       restore(card);                            // idempotent: never stack a decision
       var built = card.getAttribute("data-hour");
       if (built === null) return;               // pending / no data
       if (!stale && now.hour <= parseInt(built, 10)) return;
-      var series = (data.today || {})[card.getAttribute("data-key")];
+      var kpiKey = card.getAttribute("data-key");
+      var series = (window.kilnSeries && window.kilnSeries[kpiKey]) || (data.today || {})[kpiKey];
       var alt = (!stale && MODE === "remaining" && series)
         ? cheapestRemaining(series, now.hour) : null;
       if (alt) {

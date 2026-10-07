@@ -95,11 +95,15 @@ def kpi_html(label: str, best: dict | None, coeffs: list[float], pending: bool,
 def row_html(row: dict) -> str:
     def cell(key: str) -> str:
         c = row[key]
+        # day/programme ride along so the browser can move a whole column on the day rollover
+        day = "today" if key.endswith("today") else "tomorrow"
+        prog = "biscuit" if key.startswith("b") else "glaze"
+        attrs = f'data-day="{day}" data-prog="{prog}"'
         if c is None:
-            return '<td class="na">–</td>'
+            return f'<td class="na" {attrs}>–</td>'
         cls = f' class="{c["mark"]}"' if c["mark"] else ""
         body = f'<strong>{dkk(c["value"])}</strong>' if c["mark"] else dkk(c["value"])
-        return f"<td{cls}>{body}</td>"
+        return f"<td{cls} {attrs}>{body}</td>"
 
     return (f'    <tr><th scope="row">{row["hour"]}</th>'
             + cell("b_today") + cell("g_today") + cell("b_tom") + cell("g_tom")
@@ -164,12 +168,17 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
 
     # Everything the browser needs to decide whether a "today" optimum has already passed,
     # and (in "remaining" mode) which start hours are still available.
+    def _series(key: str) -> list[list[int]]:
+        return [[int(r["hour"][:2]), r[key]["value"]]
+                for r in data["rows"] if r[key] is not None]
+
     kpi_json = {
         "date": today.isoformat(),
         "past": cfg.get("kpi_past", "hide"),
-        "today": {key: [[int(r["hour"][:2]), r[key]["value"]]
-                       for r in data["rows"] if r[key] is not None]
-                  for key in ("b_today", "g_today")},
+        # tomorrow's series is stored under the *today* keys, so a client-side rollover is a
+        # plain swap of the two objects rather than a remapping of keys
+        "today": {"b_today": _series("b_today"), "g_today": _series("g_today")},
+        "tomorrow": {"b_today": _series("b_tom"), "g_today": _series("g_tom")},
     }
 
     alert = ""
