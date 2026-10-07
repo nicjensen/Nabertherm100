@@ -128,7 +128,7 @@ and Radius are in `tariffs.py` so far; add yours from the company's own price li
 
 1. **Create the repo** — public is simplest (Pages is free there):
    `nicjensen/kiln-prices` (any name will do).
-2. **Push this folder** to `main` (it is already a git repo with one commit).
+2. **Push this folder** to `main` (any account or token with access to that one repo).
 3. **Turn Pages on** once: *Settings → Pages → Source: Deploy from a branch →
    Branch: `main`, folder: `/docs` → Save*.
    (Or set it in one API call — see below.)
@@ -138,17 +138,19 @@ and Radius are in `tariffs.py` so far; add yours from the company's own price li
 One-time Pages setup via API, if you would rather not click:
 
 ```bash
-TOKEN=$(cat ~/.hermes/.github_token)
+TOKEN=$GITHUB_TOKEN    # a fine-grained PAT with Pages: write, scoped to this repo only
 curl -s -X POST -H "Authorization: Bearer $TOKEN" \
      -H "Accept: application/vnd.github+json" \
      https://api.github.com/repos/nicjensen/kiln-prices/pages \
      -d '{"source":{"branch":"main","path":"/docs"}}'
 ```
 
-Note: a **fine-grained** PAT must be granted *Pages: write* (and repo creation) for the
-call above to work; the nightly-backup token may only have access to `hermes-backup`.
-If it is refused, create the repo and enable Pages in the browser instead — the workflow
-itself needs nothing beyond the default `GITHUB_TOKEN` (`contents: write`).
+The workflow itself needs **no personal access token**. It commits with the default
+`GITHUB_TOKEN` (`contents: write`), which GitHub scopes to this one repository, and it runs on
+schedule/push/dispatch only — never on a fork's pull request, so a stranger's PR cannot execute
+anything in this context. The single optional secret is `ENERGIDATA_API_KEY`, a free price-API
+key rather than an account credential. Nothing in this repository can read or write any other
+repository, and publishing it grants nobody access to the account.
 
 ## Notes for future edits
 
