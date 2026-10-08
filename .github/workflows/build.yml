@@ -2,11 +2,13 @@ name: build-and-publish
 
 on:
   schedule:
-    # Tomorrow's prices are published around 13:00 local time, so one run a day is enough.
-    # Two UTC entries because of DST: 13:15 in winter (CET, UTC+1) and 13:15 in summer
-    # (CEST, UTC+2) — a single entry would drift an hour and could miss the publication.
-    - cron: "15 12 * * *"      # 13:15 CET
-    - cron: "15 11 * * *"      # 13:15 CEST
+    # Tomorrow's prices are published around 13:00 local time, so the numbers change only once a
+    # day. The run is hourly anyway, as a guard: GitHub's scheduler is best-effort and has
+    # executed these builds about six hours late, and an hourly attempt means a delayed or
+    # skipped run still lands the new prices the same afternoon. It costs nothing, because
+    # build.py carries the previous timestamp over while the prices are unchanged, so the commit
+    # step below finds no diff and the page is not redeployed. Hourly in UTC is DST-proof too.
+    - cron: "15 * * * *"
   workflow_dispatch:
   push:
     branches: [ main ]

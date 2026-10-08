@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 import sys
@@ -26,6 +27,30 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # The largest household grid company in each price area, used when the config does
 # not name one for that area.
 DEFAULT_DSO = {"DK1": "N1", "DK2": "Radius"}
+
+
+def payload_signature(payload: dict) -> str:
+    """A fingerprint of the price payload — everything except the timestamp."""
+    blob = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def resolve_stamp(out_dir: str, area: str, payload: dict, now_local: dt.datetime):
+    """The timestamp to stamp on this build, plus whether it was carried over.
+
+    New prices must stamp a new time; an unchanged payload must keep the previous one, so that
+    running the build more often than the prices change rewrites nothing and commits nothing.
+    """
+    path = os.path.join(out_dir, f"prices-{area.lower()}.json")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            previous = json.load(fh)
+        previous_stamp = dt.datetime.fromisoformat(previous.pop("generated_at"))
+    except (OSError, ValueError, KeyError, TypeError):
+        return now_local.replace(microsecond=0), False      # no usable previous build
+    if payload_signature(previous) == payload_signature(payload):
+        return previous_stamp, True
+    return now_local.replace(microsecond=0), False
 
 
 def load_config(path: str) -> dict:
@@ -193,6 +218,24 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
         note = cfg.get("tomorrow_note", "Priser i morgen opdateres kl 13:00")
 
     now_local = dt.datetime.now(TZ)
+
+    # Everything that changes when new prices arrive — the timestamp is deliberately absent.
+    # Two runs over the same prices must produce byte-identical files, or a schedule that runs
+    # more often than the prices change would commit a new timestamp every single time.
+    payload = {
+        "area": area,
+        "date": today.isoformat(),
+        "price_dataset": dataset,
+        "nettarif_selskab": dso,
+        "spot_hours_today": [{"hour": h, "price": p} for h, p in hours_today],
+        "spot_hours_tomorrow": [{"hour": h, "price": p} for h, p in hours_tomorrow],
+        "all_in_hours_today": data["hours_today"],
+        "all_in_hours_tomorrow": data["hours_tomorrow"],
+        "rows": data["rows"],
+        "cheapest": data["best"],
+        "price_basis": tariffs.composition() if dso else {"note": "spot only"},
+    }
+    stamp, reused = resolve_stamp(args.out, area, payload, now_local)
     if dso:
         basis = tariffs.describe(dso, snapshot, day=today) + (
             " Faste abonnementer (netabonnement, systemabonnement og "
@@ -218,7 +261,7 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
     for token, value in {
         "{{TITLE}}": cfg["title"],
         "{{SUBTITLE}}": cfg.get("subtitle", ""),
-        "{{UPDATED}}": now_local.strftime("%d-%m-%Y kl. %H:%M"),
+        "{{UPDATED}}": stamp.strftime("%d-%m-%Y kl. %H:%M"),
         "{{AREA}}": area,
         "{{DSO_NAME}}": (dso + " Elnet") if dso else "spotpris uden nettarif",
         "{{AREA_TOGGLE}}": area_toggle(area_links, area),
@@ -241,25 +284,14 @@ def build_area(area: str, cfg: dict, today: dt.date, args) -> dict:
     with open(os.path.join(args.out, f"{area.lower()}.html"), "w") as fh:
         fh.write(html)
 
-    snapshot = {
-        "generated_at": now_local.isoformat(timespec="seconds"),
-        "area": area,
-        "date": today.isoformat(),
-        "price_dataset": dataset,
-        "nettarif_selskab": dso,
-        "spot_hours_today": [{"hour": h, "price": p} for h, p in hours_today],
-        "spot_hours_tomorrow": [{"hour": h, "price": p} for h, p in hours_tomorrow],
-        "all_in_hours_today": data["hours_today"],
-        "all_in_hours_tomorrow": data["hours_tomorrow"],
-        "rows": data["rows"],
-        "cheapest": data["best"],
-        "price_basis": tariffs.composition() if dso else {"note": "spot only"},
-    }
+    snapshot = {"generated_at": stamp.isoformat(timespec="seconds"), **payload}
     with open(os.path.join(args.out, f"prices-{area.lower()}.json"), "w") as fh:
         json.dump(snapshot, fh, indent=2, ensure_ascii=False)
 
     print(f"[{area}] {len(hours_today)}/24 hours today, {len(hours_tomorrow)}/24 tomorrow "
           f"(dataset {dataset}, nettarif {dso or 'none'})")
+    print(f"   timestamp {'carried over (prices unchanged)' if reused else 'set to now'}: "
+          f"{stamp.strftime('%d-%m-%Y %H:%M')}")
     for label, key in (("biscuit today", "b_today"), ("glaze today", "g_today"),
                        ("biscuit tomorrow", "b_tom"), ("glaze tomorrow", "g_tom")):
         best = data["best"][key]
