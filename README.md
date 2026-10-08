@@ -30,18 +30,29 @@ passed hours included** — that is the record; the cards are only the recommend
 
 ## When it updates
 
-Tomorrow's prices are published around 13:00 local time and nothing else in the data changes
-during the day, so the workflow runs **once a day, at 13:15 local** (two cron entries, so DST
-cannot shift it) plus on every push — the first push builds the page with both days. Then **the
-browser moves the day at midnight**, so nothing has to be rebuilt for it: the "i morgen" columns
-slide into "i dag" (their numbers were computed by exactly the same server-side code, so the
-rollover relabels and reorders, it never recalculates), the cards swap places, and "i morgen"
-goes back to dashes until the next afternoon publication. Because the rollover lives in the
-page, a skipped GitHub run cannot leave the site calling yesterday "i dag".
+Tomorrow's prices are published around 13:00 local time, and nothing else in the data changes during
+the day, so the workflow runs **once a day, at 13:10 local** — two cron entries, so DST cannot shift
+it — plus on every push, which is what first builds the page with both days. Then **the browser
+moves the day at midnight**, so nothing has to be rebuilt for it: the "i morgen" columns slide into
+"i dag" (their numbers were computed by exactly the same server-side code, so the rollover relabels
+and reorders, it never recalculates), the cards swap places, and "i morgen" goes back to dashes
+until the next afternoon publication. Because the rollover lives in the page, a skipped GitHub run
+cannot leave the site calling yesterday "i dag".
+
+The build is **idempotent**, which is what makes a sparse schedule safe: `build.py` fingerprints the
+price payload (all the data, never the timestamp) and carries the previous timestamp over when it
+matches, so a run over unchanged prices rewrites nothing and the workflow commits nothing. That is
+why the DST entry that lands an hour off is harmless, and why the printed **"opdateret"** line is the
+time the prices were *fetched* — yesterday afternoon's fetch legitimately carries today's prices, so
+an old stamp is not by itself a sign that something failed.
 
 Two states are called out rather than guessed at: if the page was built before the afternoon
-publication (so it has nothing to promote), or if it is more than a day old, it says so in a
-note and hides the cards. The page always prints its own build time, so staleness stays visible.
+publication (so it has nothing to promote), or if it is more than a day old, it says so in a note
+and hides the cards. The page always prints its own build time, so staleness stays visible.
+
+One caveat worth knowing: GitHub's scheduler is best-effort and has run these builds hours late, so a
+delayed run means the update lands later that afternoon rather than not at all. Pushing to `main`, or
+Actions → *build-and-publish* → **Run workflow**, triggers the same job immediately.
 
 ## The price build-up
 
