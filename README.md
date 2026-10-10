@@ -50,9 +50,16 @@ Two states are called out rather than guessed at: if the page was built before t
 publication (so it has nothing to promote), or if it is more than a day old, it says so in a note
 and hides the cards. The page always prints its own build time, so staleness stays visible.
 
-One caveat worth knowing: GitHub's scheduler is best-effort and has run these builds hours late, so a
-delayed run means the update lands later that afternoon rather than not at all. Pushing to `main`, or
-Actions → *build-and-publish* → **Run workflow**, triggers the same job immediately.
+One caveat worth knowing: GitHub's scheduler is best-effort and has run these builds hours late, so
+a delayed run means the update lands later that afternoon rather than not at all. Pushing to `main`,
+or Actions → *build-and-publish* → **Run workflow**, triggers the same job immediately.
+
+That caveat is why the refresh no longer depends on GitHub's scheduler alone. The workflow also
+answers **`repository_dispatch`** (event type `refresh`), which needs only a Contents:write token —
+`workflow_dispatch` would need Actions:write — and a small job on Nick's always-on machine calls it
+every day at 13:10 Copenhagen time: `~/.hermes/scripts/kiln-dispatch.sh`, gated on the local hour so
+one script covers both DST cases. GitHub's own cron entries stay as a backstop: on a normal day they
+find the page already current and commit nothing.
 
 ## The price build-up
 
