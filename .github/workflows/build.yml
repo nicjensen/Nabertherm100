@@ -11,6 +11,11 @@ on:
     - cron: "10 12 * * *"      # 13:10 CET (winter)
     - cron: "10 11 * * *"      # 13:10 CEST (summer)
   workflow_dispatch:
+  # Dispatchable over the API with a Contents:write token (no Actions permission needed). This is
+  # how the page gets refreshed on time: GitHub's scheduler has run these builds 6-7 hours late and
+  # skipped a day outright, so the daily schedule below is only a backstop.
+  repository_dispatch:
+    types: [ refresh ]
   push:
     branches: [ main ]
 
