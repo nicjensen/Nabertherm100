@@ -289,7 +289,10 @@
         // the search starts at the next hour rather than treating the current one as available.
         var alt = cheapestRemaining((data["today"] || {})[key + "_today"], now.hour + 1);
         if (alt) {
-          setRow(dayRow(tile, "today"), "Billigst tilbage", alt[1], hhmm(alt[0]));
+          // "i dag" matters: the search is scoped to today's start hours, exactly like the "I dag"
+          // columns below. Without it the row reads as "the cheapest remaining full stop", which
+          // tomorrow's row then appears to contradict by an hour (23:00 today vs 00:00 tomorrow).
+          setRow(dayRow(tile, "today"), "Billigst tilbage i dag", alt[1], hhmm(alt[0]));
           tile.classList.add("alt");
           return;
         }

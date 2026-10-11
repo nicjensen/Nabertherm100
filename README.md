@@ -23,7 +23,7 @@ tomorrow before computing the windows.
 *your browser*, not at build time — the page is a snapshot rebuilt once a day, so a card can be
 hours stale by the time it is opened. Once a card's start hour has begun it is dropped
 (`kpi_past: "hide"`), or re-pointed to the cheapest start still ahead today
-(`kpi_past: "remaining"`, shown as "Billigst tilbage" with the price in burnt orange). "Ahead"
+(`kpi_past: "remaining"`, shown as "Billigst tilbage i dag" with the price in burnt orange). "Ahead"
 means the hour has not started yet:
 at 12:41 the 12:00 slot no longer counts, so a tile never recommends a start that has already
 passed. The check re-runs every minute so a page left open stays honest, and if the page is a day
