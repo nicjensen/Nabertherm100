@@ -103,6 +103,9 @@
   /* the ranking rides on the number itself, not on a filled cell: colour plus one weight step */
   tbody td.best{color:var(--best);font-weight:800}
   tbody td.second{color:var(--second);font-weight:700}
+  /* the row the tile is pointing at, in the same burnt orange as the tile's number, so the
+     recommendation can be found in the list instead of hunted for */
+  tbody td.remain{color:var(--accent-dark);font-weight:800}
   tbody tr.now th{box-shadow:inset 3px 0 0 var(--accent);color:var(--fg)}
   .note{color:var(--muted);font-size:.78rem;margin:10px 2px 0}
   .note[hidden]{display:none}
@@ -290,8 +293,23 @@
     h.textContent = "kl. " + hour;
   }
 
+  var PROG_NAME = { b: "biscuit", g: "glaze" };    // the tiles' keys vs the table's data-prog
+
+  function clearRemainingMarks() {
+    var marked = document.querySelectorAll("tbody td.remain");
+    for (var i = 0; i < marked.length; i++) marked[i].classList.remove("remain");
+  }
+
+  function markRemaining(key, hourLabel) {
+    var row = document.querySelector('tbody tr[data-hour="' + hourLabel + '"]');
+    if (!row) return;
+    var cell = row.querySelector('td[data-day="today"][data-prog="' + PROG_NAME[key] + '"]');
+    if (cell) cell.classList.add("remain");
+  }
+
   function renderTiles(now) {
     var stale = now.date !== shownDate;
+    clearRemainingMarks();
     tiles.forEach(function (tile) {
       tile.hidden = !!stale;
       if (stale) return;
@@ -317,6 +335,7 @@
           // tomorrow's row then appears to contradict by an hour (23:00 today vs 00:00 tomorrow).
           setRow(dayRow(tile, "today"), "Billigst tilbage i dag", alt[1], hhmm(alt[0]));
           tile.classList.add("alt");
+          markRemaining(key, hhmm(alt[0]));        // and let the list below point at the same row
           return;
         }
       }
