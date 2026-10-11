@@ -295,12 +295,14 @@
       // tomorrow: dashes before the afternoon publication, its optimum after
       setRow(dayRow(tile, "tomorrow"), "I morgen", tomorrow ? tomorrow.value : null,
              tomorrow ? tomorrow.hour : null);
-      // today: shown while its hour is ahead, re-pointed in "remaining" mode, else dropped
+      // today: shown while its start hour is still ahead, else re-pointed in "remaining" mode
       if (!today) { setRow(dayRow(tile, "today"), "I dag", null, null); return; }
       var hourIndex = parseInt(today.hour.slice(0, 2), 10);
-      if (now.hour <= hourIndex) { setRow(dayRow(tile, "today"), "I dag", today.value, today.hour); return; }
+      if (now.hour < hourIndex) { setRow(dayRow(tile, "today"), "I dag", today.value, today.hour); return; }
       if (MODE === "remaining") {
-        var alt = cheapestRemaining((data["today"] || {})[key + "_today"], now.hour);
+        // Only hours that have not begun: at 12:41 the 12:00 slot is already gone as a start, so
+        // the search starts at the next hour rather than treating the current one as available.
+        var alt = cheapestRemaining((data["today"] || {})[key + "_today"], now.hour + 1);
         if (alt) {
           setRow(dayRow(tile, "today"), "Tilbage i dag", alt[1], hhmm(alt[0]));
           tile.classList.add("alt");

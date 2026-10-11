@@ -21,12 +21,13 @@ tomorrow before computing the windows.
 
 **A passed optimum is not advertised.** The four "cheapest" cards at the top are checked in
 *your browser*, not at build time — the page is a snapshot rebuilt once a day, so a card can be
-hours stale by the time it is opened. Once a card's start hour is behind the current
-Copenhagen time it is dropped (`kpi_past: "hide"`), or re-pointed to the cheapest start still
-available today (`kpi_past: "remaining"`). A start hour counts as available through the end of
-that clock hour, the check re-runs every minute so a page left open stays honest, and if the
-page is a day old the cards are hidden outright. **The table below always shows the whole day,
-passed hours included** — that is the record; the cards are only the recommendation.
+hours stale by the time it is opened. Once a card's start hour has begun it is dropped
+(`kpi_past: "hide"`), or re-pointed to the cheapest start still ahead today
+(`kpi_past: "remaining"`, shown as "Tilbage i dag"). "Ahead" means the hour has not started yet:
+at 12:41 the 12:00 slot no longer counts, so a tile never recommends a start that has already
+passed. The check re-runs every minute so a page left open stays honest, and if the page is a day
+old the cards are hidden outright. **The table below always shows the whole day, passed hours
+included** — that is the record; the cards are only the recommendation.
 
 ## When it updates
 
