@@ -92,10 +92,14 @@
   tbody td.v{font-weight:600}
   tbody td.dash{color:var(--dash);font-weight:400}
   tbody td:nth-child(4),tbody td:nth-child(5){background:var(--day2)}
-  /* the ranking rides on the number itself, not on a filled cell: colour plus one weight step, so
-     the order still reads for someone who cannot separate green from amber */
+  /* the ranking rides on the number itself, not on a filled cell: colour, one weight step, and a dot
+     matching the legend — three cues, so the order reads even where colour alone cannot be trusted */
   tbody td.best{color:var(--best);font-weight:800}
   tbody td.second{color:var(--second);font-weight:700}
+  tbody td.best::before,tbody td.second::before{content:"";display:inline-block;width:6px;height:6px;
+    border-radius:50%;margin-right:5px;vertical-align:1px}
+  tbody td.best::before{background:var(--best)}
+  tbody td.second::before{background:var(--second)}
   tbody tr.now th{box-shadow:inset 3px 0 0 var(--accent);color:var(--fg)}
   .note{color:var(--muted);font-size:.78rem;margin:10px 2px 0}
   .note[hidden]{display:none}
