@@ -25,7 +25,7 @@
   :root{
     color-scheme:dark;
     --bg:#0e1116; --card:#171b22; --card2:#1e232c; --line:#2b323d; --fg:#e9ecf2; --muted:#98a2b3;
-    --best:#3ecf8e; --second:#e8c352; --accent:#ff8a3d;
+    --best:#3ecf8e; --second:#e8c352; --accent:#ff8a3d; --accent-dark:#d9711f;
     --best-bg:rgba(62,207,142,.16); --second-bg:rgba(232,195,82,.14);
     --day2:rgba(255,255,255,.03); --divider:#3b4557; --dash:#4d5663; --hero-a:#1b2a24; --hero-b:#171b22;
   }
@@ -69,6 +69,9 @@
   .drow .v.dash{font-size:1rem;font-weight:600;color:var(--muted)}
   .drow .h{font-size:.8rem;color:var(--muted);white-space:nowrap}
   .hero-tile.alt .drow[data-day="today"] .d{color:var(--accent)}
+  /* the price of a still-available alternative is burnt orange, so it does not read as the same
+     kind of number as the green "the day's optimum" price above it */
+  .hero-tile.alt .drow[data-day="today"] .v{color:var(--accent-dark)}
   table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;background:var(--card);
         border:1px solid var(--line);border-radius:16px;overflow:hidden;font-variant-numeric:tabular-nums}
   thead th{background:var(--card2);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;
@@ -286,7 +289,7 @@
         // the search starts at the next hour rather than treating the current one as available.
         var alt = cheapestRemaining((data["today"] || {})[key + "_today"], now.hour + 1);
         if (alt) {
-          setRow(dayRow(tile, "today"), "Tilbage i dag", alt[1], hhmm(alt[0]));
+          setRow(dayRow(tile, "today"), "Billigst tilbage", alt[1], hhmm(alt[0]));
           tile.classList.add("alt");
           return;
         }
