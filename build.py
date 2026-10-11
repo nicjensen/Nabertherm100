@@ -102,7 +102,7 @@ def hero_tile(key: str, prog: str, best_today: dict | None, best_tom: dict | Non
     data once an optimum's hour has passed or the day rolls over."""
     def row(label: str, day: str, best: dict | None) -> str:
         if best is None:
-            inner = '<span class="v dash">–</span><span class="h"></span>'
+            inner = '<span class="v dash">–</span><span class="h" hidden></span>'
         else:
             inner = (f'<span class="v">{best["value"]:.0f}<span>kr</span></span>'
                      f'<span class="h">kl. {best["hour"]}</span>')

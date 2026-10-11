@@ -60,7 +60,7 @@
   .drow{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:6px;margin-top:5px}
   .drow .d{flex:0 0 auto}
   .drow .v{margin-left:auto;flex:0 0 auto}
-  .drow .h{flex:0 0 auto}
+  .drow .h{flex:1 0 100%}          /* the time always gets its own line, on every row */
   .drow[hidden]{display:none}
   .drow .d{font-size:.8rem;color:var(--muted);white-space:nowrap}
   .drow .v{font-size:1.3rem;font-weight:750;letter-spacing:-.01em;text-align:right;
@@ -286,11 +286,13 @@
       v.className = "v dash";
       v.textContent = "–";
       h.textContent = "";
+      h.hidden = true;                                 // no second line when there is no time
       return;
     }
     v.className = "v";
     v.innerHTML = value + "<span>kr</span>";
     h.textContent = "kl. " + hour;
+    h.hidden = false;
   }
 
   var PROG_NAME = { b: "biscuit", g: "glaze" };    // the tiles' keys vs the table's data-prog
