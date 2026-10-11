@@ -14,22 +14,22 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ovnpriser">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Dark only: with no light theme there is nothing for the phone's own setting to flip, so the
+     page is the same on a phone in light mode as on one in dark mode. -->
+<meta name="theme-color" content="#0e1116">
 <style>
+  /* Dark only, by choice: no prefers-color-scheme branch, so a phone in light mode still gets the
+     dark card. color-scheme makes the browser draw scrollbars, form controls and the installed
+     app's launch screen dark too, which also removes the white flash on open. */
   :root{
+    color-scheme:dark;
     --bg:#0e1116; --card:#171b22; --card2:#1e232c; --line:#2b323d; --fg:#e9ecf2; --muted:#98a2b3;
     --best:#3ecf8e; --second:#e8c352; --accent:#ff8a3d;
     --best-bg:rgba(62,207,142,.16); --second-bg:rgba(232,195,82,.14);
     --day2:rgba(255,255,255,.03); --divider:#3b4557; --dash:#4d5663; --hero-a:#1b2a24; --hero-b:#171b22;
   }
-  @media (prefers-color-scheme: light){
-    :root{ --bg:#f5f6f8; --card:#ffffff; --card2:#f0f2f5; --line:#e1e5ec; --fg:#15181d; --muted:#5d6675;
-           --best:#12784a; --second:#8a6a0e; --accent:#c25a1a;
-           --best-bg:rgba(18,120,74,.13); --second-bg:rgba(138,106,14,.12);
-           --day2:rgba(0,0,0,.03); --divider:#ccd3de; --dash:#b6bec9; --hero-a:#eaf6ef; --hero-b:#ffffff; }
-  }
+  html{background:var(--bg)}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--fg);
        font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -92,8 +92,10 @@
   tbody td.v{font-weight:600}
   tbody td.dash{color:var(--dash);font-weight:400}
   tbody td:nth-child(4),tbody td:nth-child(5){background:var(--day2)}
-  tbody td.best{background:var(--best-bg);color:var(--best);font-weight:750}
-  tbody td.second{background:var(--second-bg);color:var(--second);font-weight:750}
+  /* the ranking rides on the number itself, not on a filled cell: colour plus one weight step, so
+     the order still reads for someone who cannot separate green from amber */
+  tbody td.best{color:var(--best);font-weight:800}
+  tbody td.second{color:var(--second);font-weight:700}
   tbody tr.now th{box-shadow:inset 3px 0 0 var(--accent);color:var(--fg)}
   .note{color:var(--muted);font-size:.78rem;margin:10px 2px 0}
   .note[hidden]{display:none}
@@ -111,25 +113,25 @@
   footer{color:var(--muted);font-size:.76rem;margin:18px 2px 0}
 </style>
 </head>
-<body data-build-date="2026-10-10">
+<body data-build-date="2026-10-11">
 <header>
   <h1><span class="f">🔥</span> Priser på Forglødning og Glasurbrænding</h1>
-  <p class="metaline">DK1 · N1 Elnet · opdateret 10-10-2026 kl. 17:45</p>
+  <p class="metaline">DK1 · N1 Elnet · opdateret 11-10-2026 kl. 12:22</p>
 </header>
 <main>
   <p class="sub">Nabertherm TOP100 — hvornår er det billigst at starte ovnen? Priser inkl. nettarif, Energinet-tariffer, elafgift og moms.</p>
   <div class="areas"><div class="meta">Prisområde: <span class="badge"><b>DK1 · Jylland/Fyn ✓</b></span> <a class="badge" href="dk2.html">DK2 · Sjælland</a></div></div>
   
 
-  <div class="hero"><div class="hero-tile" data-key="b" data-prog="Forglødning"><p class="n">Forglødning</p><div class="drow" data-day="today"><span class="d">I dag</span><span class="v">18<span>kr</span></span><span class="h">kl. 00:00</span></div><div class="drow" data-day="tomorrow"><span class="d">I morgen</span><span class="v">36<span>kr</span></span><span class="h">kl. 03:00</span></div></div><div class="hero-tile" data-key="g" data-prog="Glasur"><p class="n">Glasur</p><div class="drow" data-day="today"><span class="d">I dag</span><span class="v">12<span>kr</span></span><span class="h">kl. 00:00</span></div><div class="drow" data-day="tomorrow"><span class="d">I morgen</span><span class="v">28<span>kr</span></span><span class="h">kl. 10:00</span></div></div></div>
+  <div class="hero"><div class="hero-tile" data-key="b" data-prog="Forglødning"><p class="n">Forglødning</p><div class="drow" data-day="today"><span class="d">I dag</span><span class="v">36<span>kr</span></span><span class="h">kl. 03:00</span></div><div class="drow" data-day="tomorrow"><span class="d">I morgen</span><span class="v dash">–</span><span class="h"></span></div></div><div class="hero-tile" data-key="g" data-prog="Glasur"><p class="n">Glasur</p><div class="drow" data-day="today"><span class="d">I dag</span><span class="v">28<span>kr</span></span><span class="h">kl. 10:00</span></div><div class="drow" data-day="tomorrow"><span class="d">I morgen</span><span class="v dash">–</span><span class="h"></span></div></div></div>
   <p class="note" id="roll-note" hidden></p>
 
   <table>
     <thead>
       <tr class="grp">
         <th></th>
-        <th colspan="2" data-daycell="today">I dag<span>10-10-2026</span></th>
-        <th colspan="2" class="d2" data-daycell="tomorrow">I morgen<span>11-10-2026</span><span class="pill ok">offentliggjort</span></th>
+        <th colspan="2" data-daycell="today">I dag<span>11-10-2026</span></th>
+        <th colspan="2" class="d2" data-daycell="tomorrow">I morgen<span>12-10-2026</span><span class="pill">kl. 13:00</span></th>
       </tr>
       <tr>
         <th scope="col">Start</th>
@@ -138,34 +140,34 @@
       </tr>
     </thead>
     <tbody>
-    <tr data-hour="00:00"><th scope="row">00:00</th><td class="v best" data-day="today" data-prog="biscuit">18</td><td class="v best" data-day="today" data-prog="glaze">12</td><td class="v" data-day="tomorrow" data-prog="biscuit">40</td><td class="v" data-day="tomorrow" data-prog="glaze">35</td></tr>
-    <tr data-hour="01:00"><th scope="row">01:00</th><td class="v best" data-day="today" data-prog="biscuit">18</td><td class="v second" data-day="today" data-prog="glaze">13</td><td class="v" data-day="tomorrow" data-prog="biscuit">39</td><td class="v" data-day="tomorrow" data-prog="glaze">37</td></tr>
-    <tr data-hour="02:00"><th scope="row">02:00</th><td class="v best" data-day="today" data-prog="biscuit">18</td><td class="v" data-day="today" data-prog="glaze">16</td><td class="v second" data-day="tomorrow" data-prog="biscuit">37</td><td class="v" data-day="tomorrow" data-prog="glaze">40</td></tr>
-    <tr data-hour="03:00"><th scope="row">03:00</th><td class="v best" data-day="today" data-prog="biscuit">18</td><td class="v" data-day="today" data-prog="glaze">20</td><td class="v best" data-day="tomorrow" data-prog="biscuit">36</td><td class="v" data-day="tomorrow" data-prog="glaze">43</td></tr>
-    <tr data-hour="04:00"><th scope="row">04:00</th><td class="v best" data-day="today" data-prog="biscuit">18</td><td class="v" data-day="today" data-prog="glaze">23</td><td class="v best" data-day="tomorrow" data-prog="biscuit">36</td><td class="v" data-day="tomorrow" data-prog="glaze">45</td></tr>
-    <tr data-hour="05:00"><th scope="row">05:00</th><td class="v second" data-day="today" data-prog="biscuit">20</td><td class="v" data-day="today" data-prog="glaze">23</td><td class="v" data-day="tomorrow" data-prog="biscuit">39</td><td class="v" data-day="tomorrow" data-prog="glaze">45</td></tr>
-    <tr data-hour="06:00"><th scope="row">06:00</th><td class="v" data-day="today" data-prog="biscuit">25</td><td class="v" data-day="today" data-prog="glaze">22</td><td class="v" data-day="tomorrow" data-prog="biscuit">45</td><td class="v" data-day="tomorrow" data-prog="glaze">41</td></tr>
-    <tr data-hour="07:00"><th scope="row">07:00</th><td class="v" data-day="today" data-prog="biscuit">31</td><td class="v" data-day="today" data-prog="glaze">19</td><td class="v" data-day="tomorrow" data-prog="biscuit">51</td><td class="v" data-day="tomorrow" data-prog="glaze">37</td></tr>
-    <tr data-hour="08:00"><th scope="row">08:00</th><td class="v" data-day="today" data-prog="biscuit">37</td><td class="v" data-day="today" data-prog="glaze">17</td><td class="v" data-day="tomorrow" data-prog="biscuit">57</td><td class="v" data-day="tomorrow" data-prog="glaze">33</td></tr>
-    <tr data-hour="09:00"><th scope="row">09:00</th><td class="v" data-day="today" data-prog="biscuit">42</td><td class="v" data-day="today" data-prog="glaze">16</td><td class="v" data-day="tomorrow" data-prog="biscuit">62</td><td class="v second" data-day="tomorrow" data-prog="glaze">29</td></tr>
-    <tr data-hour="10:00"><th scope="row">10:00</th><td class="v" data-day="today" data-prog="biscuit">44</td><td class="v" data-day="today" data-prog="glaze">15</td><td class="v" data-day="tomorrow" data-prog="biscuit">65</td><td class="v best" data-day="tomorrow" data-prog="glaze">28</td></tr>
-    <tr data-hour="11:00"><th scope="row">11:00</th><td class="v" data-day="today" data-prog="biscuit">46</td><td class="v" data-day="today" data-prog="glaze">15</td><td class="v" data-day="tomorrow" data-prog="biscuit">67</td><td class="v" data-day="tomorrow" data-prog="glaze">31</td></tr>
-    <tr data-hour="12:00"><th scope="row">12:00</th><td class="v" data-day="today" data-prog="biscuit">47</td><td class="v" data-day="today" data-prog="glaze">24</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v" data-day="tomorrow" data-prog="glaze">45</td></tr>
-    <tr data-hour="13:00"><th scope="row">13:00</th><td class="v" data-day="today" data-prog="biscuit">48</td><td class="v" data-day="today" data-prog="glaze">38</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v" data-day="tomorrow" data-prog="glaze">61</td></tr>
-    <tr data-hour="14:00"><th scope="row">14:00</th><td class="v" data-day="today" data-prog="biscuit">47</td><td class="v" data-day="today" data-prog="glaze">53</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v" data-day="tomorrow" data-prog="glaze">76</td></tr>
-    <tr data-hour="15:00"><th scope="row">15:00</th><td class="v" data-day="today" data-prog="biscuit">47</td><td class="v" data-day="today" data-prog="glaze">62</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v" data-day="tomorrow" data-prog="glaze">85</td></tr>
-    <tr data-hour="16:00"><th scope="row">16:00</th><td class="v" data-day="today" data-prog="biscuit">47</td><td class="v" data-day="today" data-prog="glaze">63</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v" data-day="tomorrow" data-prog="glaze">86</td></tr>
-    <tr data-hour="17:00"><th scope="row">17:00</th><td class="v" data-day="today" data-prog="biscuit">47</td><td class="v" data-day="today" data-prog="glaze">61</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v" data-day="tomorrow" data-prog="glaze">83</td></tr>
-    <tr data-hour="18:00"><th scope="row">18:00</th><td class="v" data-day="today" data-prog="biscuit">45</td><td class="v" data-day="today" data-prog="glaze">55</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v" data-day="tomorrow" data-prog="glaze">76</td></tr>
-    <tr data-hour="19:00"><th scope="row">19:00</th><td class="v" data-day="today" data-prog="biscuit">44</td><td class="v" data-day="today" data-prog="glaze">50</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr data-hour="20:00"><th scope="row">20:00</th><td class="v" data-day="today" data-prog="biscuit">43</td><td class="v" data-day="today" data-prog="glaze">44</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr data-hour="21:00"><th scope="row">21:00</th><td class="v" data-day="today" data-prog="biscuit">42</td><td class="v" data-day="today" data-prog="glaze">40</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr data-hour="22:00"><th scope="row">22:00</th><td class="v" data-day="today" data-prog="biscuit">43</td><td class="v" data-day="today" data-prog="glaze">37</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
-    <tr data-hour="23:00"><th scope="row">23:00</th><td class="v" data-day="today" data-prog="biscuit">42</td><td class="v" data-day="today" data-prog="glaze">36</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="00:00"><th scope="row">00:00</th><td class="v" data-day="today" data-prog="biscuit">40</td><td class="v" data-day="today" data-prog="glaze">35</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="01:00"><th scope="row">01:00</th><td class="v" data-day="today" data-prog="biscuit">39</td><td class="v" data-day="today" data-prog="glaze">37</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="02:00"><th scope="row">02:00</th><td class="v second" data-day="today" data-prog="biscuit">37</td><td class="v" data-day="today" data-prog="glaze">40</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="03:00"><th scope="row">03:00</th><td class="v best" data-day="today" data-prog="biscuit">36</td><td class="v" data-day="today" data-prog="glaze">43</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="04:00"><th scope="row">04:00</th><td class="v best" data-day="today" data-prog="biscuit">36</td><td class="v" data-day="today" data-prog="glaze">45</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="05:00"><th scope="row">05:00</th><td class="v" data-day="today" data-prog="biscuit">39</td><td class="v" data-day="today" data-prog="glaze">45</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="06:00"><th scope="row">06:00</th><td class="v" data-day="today" data-prog="biscuit">45</td><td class="v" data-day="today" data-prog="glaze">41</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="07:00"><th scope="row">07:00</th><td class="v" data-day="today" data-prog="biscuit">51</td><td class="v" data-day="today" data-prog="glaze">37</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="08:00"><th scope="row">08:00</th><td class="v" data-day="today" data-prog="biscuit">57</td><td class="v" data-day="today" data-prog="glaze">33</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="09:00"><th scope="row">09:00</th><td class="v" data-day="today" data-prog="biscuit">62</td><td class="v second" data-day="today" data-prog="glaze">29</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="10:00"><th scope="row">10:00</th><td class="v" data-day="today" data-prog="biscuit">65</td><td class="v best" data-day="today" data-prog="glaze">28</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="11:00"><th scope="row">11:00</th><td class="v" data-day="today" data-prog="biscuit">67</td><td class="v" data-day="today" data-prog="glaze">31</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="12:00"><th scope="row">12:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">45</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="13:00"><th scope="row">13:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">61</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="14:00"><th scope="row">14:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">76</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="15:00"><th scope="row">15:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">85</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="16:00"><th scope="row">16:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">86</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="17:00"><th scope="row">17:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">83</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="18:00"><th scope="row">18:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v" data-day="today" data-prog="glaze">76</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="19:00"><th scope="row">19:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v dash" data-day="today" data-prog="glaze">–</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="20:00"><th scope="row">20:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v dash" data-day="today" data-prog="glaze">–</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="21:00"><th scope="row">21:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v dash" data-day="today" data-prog="glaze">–</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="22:00"><th scope="row">22:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v dash" data-day="today" data-prog="glaze">–</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
+    <tr data-hour="23:00"><th scope="row">23:00</th><td class="v dash" data-day="today" data-prog="biscuit">–</td><td class="v dash" data-day="today" data-prog="glaze">–</td><td class="v dash" data-day="tomorrow" data-prog="biscuit">–</td><td class="v dash" data-day="tomorrow" data-prog="glaze">–</td></tr>
     </tbody>
   </table>
 
-  <p class="note" id="tom-note" hidden>Morgendagens 24 timer står i tabellen med –, og de fyldes ud, så snart priserne offentliggøres ca. kl. 13:00.</p>
+  <p class="note" id="tom-note">Morgendagens 24 timer står i tabellen med –, og de fyldes ud, så snart priserne offentliggøres ca. kl. 13:00.</p>
 
   <div class="legend">
     <span><span class="dot b"></span>Billigste start</span>
@@ -190,7 +192,7 @@
   </p>
 </main>
 
-<script id="kiln-data" type="application/json">{"date": "2026-10-10", "past": "hide", "today": {"b_today": [[0, 18], [1, 18], [2, 18], [3, 18], [4, 18], [5, 20], [6, 25], [7, 31], [8, 37], [9, 42], [10, 44], [11, 46], [12, 47], [13, 48], [14, 47], [15, 47], [16, 47], [17, 47], [18, 45], [19, 44], [20, 43], [21, 42], [22, 43], [23, 42]], "g_today": [[0, 12], [1, 13], [2, 16], [3, 20], [4, 23], [5, 23], [6, 22], [7, 19], [8, 17], [9, 16], [10, 15], [11, 15], [12, 24], [13, 38], [14, 53], [15, 62], [16, 63], [17, 61], [18, 55], [19, 50], [20, 44], [21, 40], [22, 37], [23, 36]]}, "tomorrow": {"b_today": [[0, 40], [1, 39], [2, 37], [3, 36], [4, 36], [5, 39], [6, 45], [7, 51], [8, 57], [9, 62], [10, 65], [11, 67]], "g_today": [[0, 35], [1, 37], [2, 40], [3, 43], [4, 45], [5, 45], [6, 41], [7, 37], [8, 33], [9, 29], [10, 28], [11, 31], [12, 45], [13, 61], [14, 76], [15, 85], [16, 86], [17, 83], [18, 76]]}, "cheapest": {"b_today": {"hour": "00:00", "value": 18}, "g_today": {"hour": "00:00", "value": 12}, "b_tom": {"hour": "03:00", "value": 36}, "g_tom": {"hour": "10:00", "value": 28}}, "kwh": {"b": 29.7, "g": 29.0}}</script>
+<script id="kiln-data" type="application/json">{"date": "2026-10-11", "past": "hide", "today": {"b_today": [[0, 40], [1, 39], [2, 37], [3, 36], [4, 36], [5, 39], [6, 45], [7, 51], [8, 57], [9, 62], [10, 65], [11, 67]], "g_today": [[0, 35], [1, 37], [2, 40], [3, 43], [4, 45], [5, 45], [6, 41], [7, 37], [8, 33], [9, 29], [10, 28], [11, 31], [12, 45], [13, 61], [14, 76], [15, 85], [16, 86], [17, 83], [18, 76]]}, "tomorrow": {"b_today": [], "g_today": []}, "cheapest": {"b_today": {"hour": "03:00", "value": 36}, "g_today": {"hour": "10:00", "value": 28}, "b_tom": null, "g_tom": null}, "kwh": {"b": 29.7, "g": 29.0}}</script>
 <script>
 /* Everything time-dependent happens here, in the viewer's browser, against Copenhagen time:
  *

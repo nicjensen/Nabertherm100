@@ -14,22 +14,22 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ovnpriser">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Dark only: with no light theme there is nothing for the phone's own setting to flip, so the
+     page is the same on a phone in light mode as on one in dark mode. -->
+<meta name="theme-color" content="#0e1116">
 <style>
+  /* Dark only, by choice: no prefers-color-scheme branch, so a phone in light mode still gets the
+     dark card. color-scheme makes the browser draw scrollbars, form controls and the installed
+     app's launch screen dark too, which also removes the white flash on open. */
   :root{
+    color-scheme:dark;
     --bg:#0e1116; --card:#171b22; --card2:#1e232c; --line:#2b323d; --fg:#e9ecf2; --muted:#98a2b3;
     --best:#3ecf8e; --second:#e8c352; --accent:#ff8a3d;
     --best-bg:rgba(62,207,142,.16); --second-bg:rgba(232,195,82,.14);
     --day2:rgba(255,255,255,.03); --divider:#3b4557; --dash:#4d5663; --hero-a:#1b2a24; --hero-b:#171b22;
   }
-  @media (prefers-color-scheme: light){
-    :root{ --bg:#f5f6f8; --card:#ffffff; --card2:#f0f2f5; --line:#e1e5ec; --fg:#15181d; --muted:#5d6675;
-           --best:#12784a; --second:#8a6a0e; --accent:#c25a1a;
-           --best-bg:rgba(18,120,74,.13); --second-bg:rgba(138,106,14,.12);
-           --day2:rgba(0,0,0,.03); --divider:#ccd3de; --dash:#b6bec9; --hero-a:#eaf6ef; --hero-b:#ffffff; }
-  }
+  html{background:var(--bg)}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--fg);
        font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -92,8 +92,10 @@
   tbody td.v{font-weight:600}
   tbody td.dash{color:var(--dash);font-weight:400}
   tbody td:nth-child(4),tbody td:nth-child(5){background:var(--day2)}
-  tbody td.best{background:var(--best-bg);color:var(--best);font-weight:750}
-  tbody td.second{background:var(--second-bg);color:var(--second);font-weight:750}
+  /* the ranking rides on the number itself, not on a filled cell: colour plus one weight step, so
+     the order still reads for someone who cannot separate green from amber */
+  tbody td.best{color:var(--best);font-weight:800}
+  tbody td.second{color:var(--second);font-weight:700}
   tbody tr.now th{box-shadow:inset 3px 0 0 var(--accent);color:var(--fg)}
   .note{color:var(--muted);font-size:.78rem;margin:10px 2px 0}
   .note[hidden]{display:none}
