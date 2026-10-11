@@ -92,14 +92,9 @@
   tbody td.v{font-weight:600}
   tbody td.dash{color:var(--dash);font-weight:400}
   tbody td:nth-child(4),tbody td:nth-child(5){background:var(--day2)}
-  /* the ranking rides on the number itself, not on a filled cell: colour, one weight step, and a dot
-     matching the legend — three cues, so the order reads even where colour alone cannot be trusted */
+  /* the ranking rides on the number itself, not on a filled cell: colour plus one weight step */
   tbody td.best{color:var(--best);font-weight:800}
   tbody td.second{color:var(--second);font-weight:700}
-  tbody td.best::before,tbody td.second::before{content:"";display:inline-block;width:6px;height:6px;
-    border-radius:50%;margin-right:5px;vertical-align:1px}
-  tbody td.best::before{background:var(--best)}
-  tbody td.second::before{background:var(--second)}
   tbody tr.now th{box-shadow:inset 3px 0 0 var(--accent);color:var(--fg)}
   .note{color:var(--muted);font-size:.78rem;margin:10px 2px 0}
   .note[hidden]{display:none}
@@ -196,7 +191,7 @@
   </p>
 </main>
 
-<script id="kiln-data" type="application/json">{"date": "2026-10-11", "past": "hide", "today": {"b_today": [[0, 40], [1, 39], [2, 37], [3, 36], [4, 36], [5, 39], [6, 45], [7, 51], [8, 57], [9, 62], [10, 65], [11, 67]], "g_today": [[0, 35], [1, 37], [2, 40], [3, 43], [4, 45], [5, 45], [6, 41], [7, 37], [8, 33], [9, 29], [10, 28], [11, 31], [12, 45], [13, 61], [14, 76], [15, 85], [16, 86], [17, 83], [18, 76]]}, "tomorrow": {"b_today": [], "g_today": []}, "cheapest": {"b_today": {"hour": "03:00", "value": 36}, "g_today": {"hour": "10:00", "value": 28}, "b_tom": null, "g_tom": null}, "kwh": {"b": 29.7, "g": 29.0}}</script>
+<script id="kiln-data" type="application/json">{"date": "2026-10-11", "past": "remaining", "today": {"b_today": [[0, 40], [1, 39], [2, 37], [3, 36], [4, 36], [5, 39], [6, 45], [7, 51], [8, 57], [9, 62], [10, 65], [11, 67]], "g_today": [[0, 35], [1, 37], [2, 40], [3, 43], [4, 45], [5, 45], [6, 41], [7, 37], [8, 33], [9, 29], [10, 28], [11, 31], [12, 45], [13, 61], [14, 76], [15, 85], [16, 86], [17, 83], [18, 76]]}, "tomorrow": {"b_today": [], "g_today": []}, "cheapest": {"b_today": {"hour": "03:00", "value": 36}, "g_today": {"hour": "10:00", "value": 28}, "b_tom": null, "g_tom": null}, "kwh": {"b": 29.7, "g": 29.0}}</script>
 <script>
 /* Everything time-dependent happens here, in the viewer's browser, against Copenhagen time:
  *
