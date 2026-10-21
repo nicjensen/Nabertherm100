@@ -34,7 +34,12 @@ included** — that is the record; the cards are only the recommendation.
 
 Tomorrow's prices are published around 13:00 local time, and nothing else in the data changes during
 the day, so the workflow runs **once a day, at 13:10 local** — two cron entries, so DST cannot shift
-it — plus on every push, which is what first builds the page with both days. Then **the browser
+it — plus on every push, which is what first builds the page with both days. The publication is not
+punctual — on 2026-10-21 the 13:10 build found nothing and the prices only appeared by 13:55 — so the
+trigger reads the deployed payload and **retries hourly from 13:10 to 17:10** until tomorrow has all
+24 hours; on a normal day the later attempts see the page is already current and do nothing.
+
+Then **the browser
 moves the day at midnight**, so nothing has to be rebuilt for it: the "i morgen" columns slide into
 "i dag" (their numbers were computed by exactly the same server-side code, so the rollover relabels
 and reorders, it never recalculates), the cards swap places, and "i morgen" goes back to dashes
