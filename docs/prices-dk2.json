@@ -1,418 +1,418 @@
 {
-  "generated_at": "2026-10-26T13:11:07+01:00",
+  "generated_at": "2026-10-27T13:11:06+01:00",
   "area": "DK2",
-  "date": "2026-10-26",
+  "date": "2026-10-27",
   "price_dataset": "DayAheadPrices",
   "nettarif_selskab": "Radius",
   "spot_hours_today": [
     {
       "hour": "00:00",
-      "price": 0.102928
+      "price": 0.340248
     },
     {
       "hour": "01:00",
-      "price": 0.186814
+      "price": 0.432168
     },
     {
       "hour": "02:00",
-      "price": 0.140825
+      "price": 0.399149
     },
     {
       "hour": "03:00",
-      "price": 0.112627
+      "price": 0.345126
     },
     {
       "hour": "04:00",
-      "price": 0.140526
+      "price": 0.264361
     },
     {
       "hour": "05:00",
-      "price": 0.339449
+      "price": 0.252252
     },
     {
       "hour": "06:00",
-      "price": 0.693643
+      "price": 0.241339
     },
     {
       "hour": "07:00",
-      "price": 0.84796
+      "price": 0.594687
     },
     {
       "hour": "08:00",
-      "price": 0.81509
+      "price": 0.839745
     },
     {
       "hour": "09:00",
-      "price": 0.576363
+      "price": 0.803007
     },
     {
       "hour": "10:00",
-      "price": 0.543923
+      "price": 0.635368
     },
     {
       "hour": "11:00",
-      "price": 0.450282
+      "price": 0.495442
     },
     {
       "hour": "12:00",
-      "price": 0.511538
+      "price": 0.401186
     },
     {
       "hour": "13:00",
-      "price": 0.686411
+      "price": 0.504692
     },
     {
       "hour": "14:00",
-      "price": 0.815837
+      "price": 0.552231
     },
     {
       "hour": "15:00",
-      "price": 0.97619
+      "price": 0.798279
     },
     {
       "hour": "16:00",
-      "price": 1.133124
+      "price": 0.95237
     },
     {
       "hour": "17:00",
-      "price": 1.34068
+      "price": 1.128848
     },
     {
       "hour": "18:00",
-      "price": 1.346137
+      "price": 1.134192
     },
     {
       "hour": "19:00",
-      "price": 1.198323
+      "price": 1.133725
     },
     {
       "hour": "20:00",
-      "price": 1.092797
+      "price": 1.085009
     },
     {
       "hour": "21:00",
-      "price": 0.935714
+      "price": 1.113805
     },
     {
       "hour": "22:00",
-      "price": 0.738155
+      "price": 1.062024
     },
     {
       "hour": "23:00",
-      "price": 0.378001
+      "price": 1.068882
     }
   ],
   "spot_hours_tomorrow": [
     {
       "hour": "00:00",
-      "price": 0.340253
+      "price": 1.115468
     },
     {
       "hour": "01:00",
-      "price": 0.432174
+      "price": 1.153982
     },
     {
       "hour": "02:00",
-      "price": 0.399154
+      "price": 1.191355
     },
     {
       "hour": "03:00",
-      "price": 0.34513
+      "price": 1.228112
     },
     {
       "hour": "04:00",
-      "price": 0.264365
+      "price": 1.282771
     },
     {
       "hour": "05:00",
-      "price": 0.252256
+      "price": 1.285219
     },
     {
       "hour": "06:00",
-      "price": 0.241343
+      "price": 1.678164
     },
     {
       "hour": "07:00",
-      "price": 0.594695
+      "price": 2.014805
     },
     {
       "hour": "08:00",
-      "price": 0.839756
+      "price": 2.039528
     },
     {
       "hour": "09:00",
-      "price": 0.803018
+      "price": 1.748426
     },
     {
       "hour": "10:00",
-      "price": 0.635377
+      "price": 1.593382
     },
     {
       "hour": "11:00",
-      "price": 0.495448
+      "price": 1.532911
     },
     {
       "hour": "12:00",
-      "price": 0.401191
+      "price": 1.459061
     },
     {
       "hour": "13:00",
-      "price": 0.504698
+      "price": 1.422996
     },
     {
       "hour": "14:00",
-      "price": 0.552238
+      "price": 1.469844
     },
     {
       "hour": "15:00",
-      "price": 0.79829
+      "price": 1.70425
     },
     {
       "hour": "16:00",
-      "price": 0.952383
+      "price": 2.083479
     },
     {
       "hour": "17:00",
-      "price": 1.128863
+      "price": 2.207223
     },
     {
       "hour": "18:00",
-      "price": 1.134207
+      "price": 2.288155
     },
     {
       "hour": "19:00",
-      "price": 1.13374
+      "price": 2.13711
     },
     {
       "hour": "20:00",
-      "price": 1.085023
+      "price": 2.142324
     },
     {
       "hour": "21:00",
-      "price": 1.11382
+      "price": 1.915429
     },
     {
       "hour": "22:00",
-      "price": 1.062038
+      "price": 1.729122
     },
     {
       "hour": "23:00",
-      "price": 1.068896
+      "price": 1.631185
     }
   ],
   "all_in_hours_today": [
     {
       "hour": "00:00",
-      "price": 0.415379
+      "price": 0.712029
     },
     {
       "hour": "01:00",
-      "price": 0.520236
+      "price": 0.826929
     },
     {
       "hour": "02:00",
-      "price": 0.46275
+      "price": 0.785655
     },
     {
       "hour": "03:00",
-      "price": 0.427503
+      "price": 0.718126
     },
     {
       "hour": "04:00",
-      "price": 0.462376
+      "price": 0.61717
     },
     {
       "hour": "05:00",
-      "price": 0.71103
+      "price": 0.602034
     },
     {
       "hour": "06:00",
-      "price": 1.419209
+      "price": 0.853829
     },
     {
       "hour": "07:00",
-      "price": 1.612105
+      "price": 1.295514
     },
     {
       "hour": "08:00",
-      "price": 1.571017
+      "price": 1.601836
     },
     {
       "hour": "09:00",
-      "price": 1.272609
+      "price": 1.555914
     },
     {
       "hour": "10:00",
-      "price": 1.232059
+      "price": 1.346365
     },
     {
       "hour": "11:00",
-      "price": 1.115007
+      "price": 1.171457
     },
     {
       "hour": "12:00",
-      "price": 1.191577
+      "price": 1.053637
     },
     {
       "hour": "13:00",
-      "price": 1.410169
+      "price": 1.18302
     },
     {
       "hour": "14:00",
-      "price": 1.571951
+      "price": 1.242444
     },
     {
       "hour": "15:00",
-      "price": 1.772393
+      "price": 1.550004
     },
     {
       "hour": "16:00",
-      "price": 1.96856
+      "price": 1.742617
     },
     {
       "hour": "17:00",
-      "price": 3.024316
+      "price": 2.759526
     },
     {
       "hour": "18:00",
-      "price": 3.031137
+      "price": 2.766206
     },
     {
       "hour": "19:00",
-      "price": 2.84637
+      "price": 2.765623
     },
     {
       "hour": "20:00",
-      "price": 2.714462
+      "price": 2.704727
     },
     {
       "hour": "21:00",
-      "price": 1.721798
+      "price": 1.944411
     },
     {
       "hour": "22:00",
-      "price": 1.474849
+      "price": 1.879685
     },
     {
       "hour": "23:00",
-      "price": 1.024656
+      "price": 1.888258
     }
   ],
   "all_in_hours_tomorrow": [
     {
       "hour": "00:00",
-      "price": 0.712035
+      "price": 1.681054
     },
     {
       "hour": "01:00",
-      "price": 0.826936
+      "price": 1.729196
     },
     {
       "hour": "02:00",
-      "price": 0.785661
+      "price": 1.775913
     },
     {
       "hour": "03:00",
-      "price": 0.718131
+      "price": 1.821859
     },
     {
       "hour": "04:00",
-      "price": 0.617175
+      "price": 1.890183
     },
     {
       "hour": "05:00",
-      "price": 0.602039
+      "price": 1.893242
     },
     {
       "hour": "06:00",
-      "price": 0.853834
+      "price": 2.64986
     },
     {
       "hour": "07:00",
-      "price": 1.295524
+      "price": 3.070661
     },
     {
       "hour": "08:00",
-      "price": 1.60185
+      "price": 3.101565
     },
     {
       "hour": "09:00",
-      "price": 1.555927
+      "price": 2.737687
     },
     {
       "hour": "10:00",
-      "price": 1.346376
+      "price": 2.543883
     },
     {
       "hour": "11:00",
-      "price": 1.171465
+      "price": 2.468294
     },
     {
       "hour": "12:00",
-      "price": 1.053644
+      "price": 2.375981
     },
     {
       "hour": "13:00",
-      "price": 1.183027
+      "price": 2.3309
     },
     {
       "hour": "14:00",
-      "price": 1.242452
+      "price": 2.38946
     },
     {
       "hour": "15:00",
-      "price": 1.550018
+      "price": 2.682468
     },
     {
       "hour": "16:00",
-      "price": 1.742634
+      "price": 3.156504
     },
     {
       "hour": "17:00",
-      "price": 2.759545
+      "price": 4.107495
     },
     {
       "hour": "18:00",
-      "price": 2.766225
+      "price": 4.20866
     },
     {
       "hour": "19:00",
-      "price": 2.765641
+      "price": 4.019854
     },
     {
       "hour": "20:00",
-      "price": 2.704745
+      "price": 4.026371
     },
     {
       "hour": "21:00",
-      "price": 1.94443
+      "price": 2.946441
     },
     {
       "hour": "22:00",
-      "price": 1.879703
+      "price": 2.713557
     },
     {
       "hour": "23:00",
-      "price": 1.888275
+      "price": 2.591136
     }
   ],
   "rows": [
     {
       "hour": "00:00",
       "b_today": {
-        "value": 31,
-        "mark": "second"
-      },
-      "g_today": {
-        "value": 15,
-        "mark": "best"
-      },
-      "b_tom": {
         "value": 32,
         "mark": "best"
       },
-      "g_tom": {
+      "g_today": {
         "value": 20,
+        "mark": "best"
+      },
+      "b_tom": {
+        "value": 71,
+        "mark": "best"
+      },
+      "g_tom": {
+        "value": 53,
         "mark": "best"
       }
     },
@@ -420,82 +420,82 @@
       "hour": "01:00",
       "b_today": {
         "value": 33,
-        "mark": null
+        "mark": "second"
       },
       "g_today": {
         "value": 21,
         "mark": "second"
       },
       "b_tom": {
-        "value": 33,
+        "value": 72,
         "mark": "second"
       },
       "g_tom": {
-        "value": 21,
+        "value": 59,
         "mark": "second"
       }
     },
     {
       "hour": "02:00",
       "b_today": {
-        "value": 35,
-        "mark": null
-      },
-      "g_today": {
-        "value": 29,
-        "mark": null
-      },
-      "b_tom": {
         "value": 34,
         "mark": null
       },
-      "g_tom": {
+      "g_today": {
         "value": 24,
+        "mark": null
+      },
+      "b_tom": {
+        "value": 73,
+        "mark": null
+      },
+      "g_tom": {
+        "value": 67,
         "mark": null
       }
     },
     {
       "hour": "03:00",
       "b_today": {
-        "value": 37,
-        "mark": null
-      },
-      "g_today": {
-        "value": 36,
-        "mark": null
-      },
-      "b_tom": {
         "value": 35,
         "mark": null
       },
-      "g_tom": {
+      "g_today": {
         "value": 31,
+        "mark": null
+      },
+      "b_tom": {
+        "value": 74,
+        "mark": null
+      },
+      "g_tom": {
+        "value": 76,
         "mark": null
       }
     },
     {
       "hour": "04:00",
       "b_today": {
-        "value": 40,
-        "mark": null
-      },
-      "g_today": {
-        "value": 39,
-        "mark": null
-      },
-      "b_tom": {
         "value": 37,
         "mark": null
       },
-      "g_tom": {
+      "g_today": {
         "value": 36,
+        "mark": null
+      },
+      "b_tom": {
+        "value": 76,
+        "mark": null
+      },
+      "g_tom": {
+        "value": 80,
         "mark": null
       }
     },
     {
       "hour": "05:00",
       "b_today": {
-        "value": 45,
+        "value": 41,
         "mark": null
       },
       "g_today": {
@@ -503,37 +503,37 @@
         "mark": null
       },
       "b_tom": {
-        "value": 41,
+        "value": 80,
         "mark": null
       },
       "g_tom": {
-        "value": 39,
+        "value": 80,
         "mark": null
       }
     },
     {
       "hour": "06:00",
       "b_today": {
-        "value": 51,
-        "mark": null
-      },
-      "g_today": {
-        "value": 38,
-        "mark": null
-      },
-      "b_tom": {
         "value": 47,
         "mark": null
       },
-      "g_tom": {
+      "g_today": {
         "value": 39,
+        "mark": null
+      },
+      "b_tom": {
+        "value": 86,
+        "mark": null
+      },
+      "g_tom": {
+        "value": 78,
         "mark": null
       }
     },
     {
       "hour": "07:00",
       "b_today": {
-        "value": 56,
+        "value": 52,
         "mark": null
       },
       "g_today": {
@@ -541,68 +541,68 @@
         "mark": null
       },
       "b_tom": {
-        "value": 52,
+        "value": 91,
         "mark": null
       },
       "g_tom": {
-        "value": 37,
+        "value": 76,
         "mark": null
       }
     },
     {
       "hour": "08:00",
       "b_today": {
-        "value": 60,
-        "mark": null
-      },
-      "g_today": {
-        "value": 37,
-        "mark": null
-      },
-      "b_tom": {
         "value": 56,
         "mark": null
       },
-      "g_tom": {
+      "g_today": {
         "value": 36,
+        "mark": null
+      },
+      "b_tom": {
+        "value": 94,
+        "mark": null
+      },
+      "g_tom": {
+        "value": 72,
         "mark": null
       }
     },
     {
       "hour": "09:00",
       "b_today": {
-        "value": 63,
-        "mark": null
-      },
-      "g_today": {
-        "value": 39,
-        "mark": null
-      },
-      "b_tom": {
         "value": 59,
         "mark": null
       },
-      "g_tom": {
+      "g_today": {
         "value": 35,
+        "mark": null
+      },
+      "b_tom": {
+        "value": 97,
+        "mark": null
+      },
+      "g_tom": {
+        "value": 70,
         "mark": null
       }
     },
     {
       "hour": "10:00",
       "b_today": {
-        "value": 63,
-        "mark": null
-      },
-      "g_today": {
-        "value": 42,
-        "mark": null
-      },
-      "b_tom": {
         "value": 60,
         "mark": null
       },
-      "g_tom": {
+      "g_today": {
         "value": 37,
+        "mark": null
+      },
+      "b_tom": {
+        "value": 97,
+        "mark": null
+      },
+      "g_tom": {
+        "value": 71,
         "mark": null
       }
     },
@@ -613,138 +613,138 @@
         "mark": null
       },
       "g_today": {
-        "value": 47,
+        "value": 40,
         "mark": null
       },
       "b_tom": {
-        "value": 61,
+        "value": 96,
         "mark": null
       },
       "g_tom": {
-        "value": 40,
+        "value": 76,
         "mark": null
       }
     },
     {
       "hour": "12:00",
       "b_today": {
-        "value": 58,
+        "value": 61,
         "mark": null
       },
       "g_today": {
-        "value": 58,
+        "value": 51,
         "mark": null
       },
       "b_tom": null,
       "g_tom": {
-        "value": 51,
+        "value": 87,
         "mark": null
       }
     },
     {
       "hour": "13:00",
       "b_today": {
-        "value": 55,
+        "value": 61,
         "mark": null
       },
       "g_today": {
-        "value": 68,
+        "value": 61,
         "mark": null
       },
       "b_tom": null,
       "g_tom": {
-        "value": 61,
+        "value": 99,
         "mark": null
       }
     },
     {
       "hour": "14:00",
       "b_today": {
-        "value": 51,
+        "value": 61,
         "mark": null
       },
       "g_today": {
-        "value": 76,
+        "value": 70,
         "mark": null
       },
       "b_tom": null,
       "g_tom": {
-        "value": 70,
+        "value": 108,
         "mark": null
       }
     },
     {
       "hour": "15:00",
       "b_today": {
-        "value": 47,
+        "value": 60,
         "mark": null
       },
       "g_today": {
-        "value": 79,
+        "value": 74,
         "mark": null
       },
       "b_tom": null,
       "g_tom": {
-        "value": 74,
+        "value": 113,
         "mark": null
       }
     },
     {
       "hour": "16:00",
       "b_today": {
-        "value": 43,
+        "value": 60,
         "mark": null
       },
       "g_today": {
-        "value": 74,
+        "value": 72,
         "mark": null
       },
       "b_tom": null,
       "g_tom": {
-        "value": 72,
+        "value": 109,
         "mark": null
       }
     },
     {
       "hour": "17:00",
       "b_today": {
-        "value": 39,
+        "value": 60,
         "mark": null
       },
       "g_today": {
-        "value": 66,
+        "value": 68,
         "mark": null
       },
       "b_tom": null,
       "g_tom": {
-        "value": 68,
+        "value": 102,
         "mark": null
       }
     },
     {
       "hour": "18:00",
       "b_today": {
-        "value": 35,
+        "value": 59,
         "mark": null
       },
       "g_today": {
-        "value": 53,
+        "value": 62,
         "mark": null
       },
       "b_tom": null,
       "g_tom": {
-        "value": 62,
+        "value": 91,
         "mark": null
       }
     },
     {
       "hour": "19:00",
       "b_today": {
-        "value": 32,
+        "value": 61,
         "mark": null
       },
       "g_today": {
-        "value": 42,
+        "value": 58,
         "mark": null
       },
       "b_tom": null,
@@ -753,11 +753,11 @@
     {
       "hour": "20:00",
       "b_today": {
-        "value": 30,
-        "mark": "best"
+        "value": 64,
+        "mark": null
       },
       "g_today": {
-        "value": 33,
+        "value": 54,
         "mark": null
       },
       "b_tom": null,
@@ -766,11 +766,11 @@
     {
       "hour": "21:00",
       "b_today": {
-        "value": 30,
-        "mark": "best"
+        "value": 66,
+        "mark": null
       },
       "g_today": {
-        "value": 27,
+        "value": 52,
         "mark": null
       },
       "b_tom": null,
@@ -779,11 +779,11 @@
     {
       "hour": "22:00",
       "b_today": {
-        "value": 31,
-        "mark": "second"
+        "value": 69,
+        "mark": null
       },
       "g_today": {
-        "value": 25,
+        "value": 52,
         "mark": null
       },
       "b_tom": null,
@@ -792,11 +792,11 @@
     {
       "hour": "23:00",
       "b_today": {
-        "value": 32,
+        "value": 70,
         "mark": null
       },
       "g_today": {
-        "value": 22,
+        "value": 52,
         "mark": null
       },
       "b_tom": null,
@@ -805,24 +805,24 @@
   ],
   "cheapest": {
     "b_today": {
-      "index": 20,
-      "hour": "20:00",
-      "value": 30
-    },
-    "g_today": {
-      "index": 0,
-      "hour": "00:00",
-      "value": 15
-    },
-    "b_tom": {
       "index": 0,
       "hour": "00:00",
       "value": 32
     },
-    "g_tom": {
+    "g_today": {
       "index": 0,
       "hour": "00:00",
       "value": 20
+    },
+    "b_tom": {
+      "index": 0,
+      "hour": "00:00",
+      "value": 71
+    },
+    "g_tom": {
+      "index": 0,
+      "hour": "00:00",
+      "value": 53
     }
   },
   "price_basis": {
