@@ -1,7 +1,7 @@
 {
   "source": "api.energidataservice.dk/dataset/DatahubPricelist",
   "note": "ChargeType D03 (nettarif), kundekategori C. Prices are kr/kWh EXCL. moms, as published; Price1..24 = hours 00-23 local Danish time.",
-  "fetched_at": "2026-11-01T17:05:41+00:00",
+  "fetched_at": "2026-11-01T17:54:20+00:00",
   "companies": {
     "N1": {
       "gln": "5790001089030",
